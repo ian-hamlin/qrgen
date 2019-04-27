@@ -71,7 +71,7 @@ output to the current working directory.
 ```console
 $ # macOS
 $ ./qrgen wiktionary.csv
-$ ./qrgen wiktionary_small.csv -s // This file has headers to the first line will now be skipped.
+$ ./qrgen wiktionary_small.csv -s // This file has headers so the first line will now be skipped.
 ```
 
 ### Logging
