@@ -1,5 +1,6 @@
-[![Build Status](https://dev.azure.com/morpork73/qrgen/_apis/build/status/ian-hamlin.qrgen?branchName=master)](https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=1&branchName=master)
-[![dependency status](https://deps.rs/repo/github/ian-hamlin/qrgen/status.svg)](https://deps.rs/repo/github/ian-hamlin/qrgen)
+[![Build Status][azure-badge]][azure-url]
+[![MIT licensed][license-badge]][license-url]
+[![dependency status][dependency-badge]][dependency-url]
 
 # About
 
@@ -103,3 +104,10 @@ user	0m16.928s
 sys	0m1.539s
 
 ```
+
+[azure-badge]: https://dev.azure.com/morpork73/qrgen/_apis/build/status/ian-hamlin.qrgen?branchName=master
+[azure-url]: https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=1&branchName=master
+[license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license-url]: LICENSE
+[dependency-badge]: https://deps.rs/repo/github/ian-hamlin/qrgen/status.svg
+[dependency-url]: https://deps.rs/repo/github/ian-hamlin/qrgen
