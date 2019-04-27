@@ -1,4 +1,5 @@
 [![Build Status](https://dev.azure.com/morpork73/qrgen/_apis/build/status/ian-hamlin.qrgen?branchName=master)](https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=1&branchName=master)
+[![dependency status](https://deps.rs/repo/github/ian-hamlin/qrgen/status.svg)](https://deps.rs/repo/github/ian-hamlin/qrgen)
 
 # About
 
