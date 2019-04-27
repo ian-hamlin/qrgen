@@ -1,3 +1,5 @@
+[![Build Status](https://dev.azure.com/morpork73/qrgen/_apis/build/status/ian-hamlin.qrgen?branchName=master)](https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=1&branchName=master)
+
 # About
 
 A simple command line tool to bulk-generate QR Codes from one or more CSV files.
