@@ -72,7 +72,10 @@ fn write_svg(
     Ok(())
 }
 
-fn next_chunk(chunk_size: usize, reader: &mut csv::Reader<File>) -> Option<Vec<csv::StringRecord>> {
+fn next_chunk<T>(chunk_size: usize, reader: &mut csv::Reader<T>) -> Option<Vec<csv::StringRecord>>
+where
+    T: std::io::Read,
+{
     let mut chunks = Vec::new();
 
     for (total, result) in reader.records().enumerate() {
@@ -111,5 +114,34 @@ fn generate_qr(data: &str, settings: &settings::Settings) -> Option<qrcodegen::Q
             warn!("{:?}", e);
             None
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn should_give_chunks() {
+        let input = "12\n34\n56\n78\n90".as_bytes();
+        let mut reader = csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(input);
+
+        let chunk = next_chunk(2, &mut reader).unwrap();
+        assert_eq!(chunk.len(), 2);
+        assert_eq!(csv::StringRecord::from(vec!["12"]), chunk[0]);
+        assert_eq!(csv::StringRecord::from(vec!["34"]), chunk[1]);
+
+        let chunk = next_chunk(2, &mut reader).unwrap();
+        assert_eq!(chunk.len(), 2);
+        assert_eq!(csv::StringRecord::from(vec!["56"]), chunk[0]);
+        assert_eq!(csv::StringRecord::from(vec!["78"]), chunk[1]);
+
+        let chunk = next_chunk(2, &mut reader).unwrap();
+        assert_eq!(chunk.len(), 1);
+        assert_eq!(csv::StringRecord::from(vec!["90"]), chunk[0]);
+
+        assert_eq!(None, next_chunk(2, &mut reader));
     }
 }
