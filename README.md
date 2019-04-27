@@ -5,7 +5,7 @@ A simple command line tool to bulk-generate QR Codes from one or more CSV files.
 Allows control over the following QR configuration options:
 
 * QR max and min version
-* Error correct level
+* Error correction level
 * Mask
 
 ## Description
