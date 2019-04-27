@@ -6,3 +6,9 @@ jobs:
 - template: ci/azure-rustfmt.yml
   parameters:
     name: rustfmt
+
+# Test the app
+- template: ci/azure-test-stable.yml
+  parameters:
+    name: test_qrgen
+    displayName: Test qrgen
