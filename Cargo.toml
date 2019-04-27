@@ -1,0 +1,13 @@
+[package]
+name = "qrgen"
+version = "0.1.0"
+authors = ["ian-hamlin <ian@ihamlin.co.uk>"]
+edition = "2018"
+
+[dependencies]
+structopt = "0.2"
+qrcodegen = "1.4.0"
+log = "0.4.0"
+env_logger = "0.6.1"
+csv = "1.0.1"
+rayon = "1.0"
