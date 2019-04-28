@@ -1,38 +1,72 @@
 trigger:
   branches:
     include:
-      - refs/heads/master
-      - refs/tags/*
+    - refs/heads/master
+    - refs/tags/*
 
 jobs:
-# Check formatting
-- template: ci/azure-rustfmt.yml
-  parameters:
-    name: rustfmt
+  - job: run_rustfmt
+    displayName: "Run rust fmt"
+    pool:
+        vmImage: ubuntu-16.04
+    steps:
+    - template: azure-install-rust.yml
+      parameters:
+        rust_version: stable
+    - script: |
+        rustup component add rustfmt
+      displayName: Install rustfmt
+    - script: |
+        cargo fmt --all -- --check
+      displayName: Check formatting
+  - job: run_cargo_test
+    displayName: "cargo test"
+    strategy:
+      matrix:
+        Linux:
+          vmImage: ubuntu-16.04
+        MacOS:
+          vmImage: macOS-10.13
+        Windows:
+          vmImage: vs2017-win2016
+    pool:
+      vmImage: $(vmImage)
+    steps:
+    - template: azure-install-rust.yml
+      parameters:
+        rust_version: stable
+    - script: cargo test
+      displayName: Cargo test
 
-# Test the app
-- template: ci/azure-test-stable.yml
-  parameters:
-    name: test_qrgen
-    displayName: Test qrgen
+# jobs:
+# # Check formatting
+# - template: ci/azure-rustfmt.yml
+#   parameters:
+#     name: rustfmt
 
-# Release Windows
-- template: ci/azure-release.yml
-  parameters:
-    name: dist_windows
-    displayName: "Distribute Windows Binary"
-    vmImage: vs2017-win2016
+# # Test the app
+# - template: ci/azure-test-stable.yml
+#   parameters:
+#     name: test_qrgen
+#     displayName: Test qrgen
 
-# Release Mac
-- template: ci/azure-release.yml
-  parameters:
-    name: dist_darwin
-    displayName: "Distribute Darwin Binary"
-    vmImage: macOS-10.13
+# # Release Windows
+# - template: ci/azure-release.yml
+#   parameters:
+#     name: dist_windows
+#     displayName: "Distribute Windows Binary"
+#     vmImage: vs2017-win2016
 
-# Release Ubuntu
-- template: ci/azure-release.yml
-  parameters:
-    name: dist_ubuntu
-    displayName: "Distribute Ubuntu Binary"
-    vmImage: ubuntu-16.04
+# # Release Mac
+# - template: ci/azure-release.yml
+#   parameters:
+#     name: dist_darwin
+#     displayName: "Distribute Darwin Binary"
+#     vmImage: macOS-10.13
+
+# # Release Ubuntu
+# - template: ci/azure-release.yml
+#   parameters:
+#     name: dist_ubuntu
+#     displayName: "Distribute Ubuntu Binary"
+#     vmImage: ubuntu-16.04
