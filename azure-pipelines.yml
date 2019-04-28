@@ -15,3 +15,10 @@ jobs:
   parameters:
     name: test_qrgen
     displayName: Test qrgen
+
+  # Release
+- template: ci/azure-azure-release.yml
+  parameters:
+    name: dist_windows
+    displayName: "Distribute Windows binary"
+    vmImage: vs2017-win2016
