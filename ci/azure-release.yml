@@ -4,8 +4,8 @@ jobs:
   pool:
     vmImage: ${{ parameters.vmImage }}
   steps:
-    - template: ci/azure-install-rust.yml
+    - template: azure-install-rust.yml
     - script: cargo build --release
-    - template: ci/azure-create-tarball.yml
+    - template: azure-create-tarball.yml
       parameters:
         name: ${{ parameters.name }}
