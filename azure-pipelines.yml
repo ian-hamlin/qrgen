@@ -46,12 +46,15 @@ jobs:
         Linux:
           vmImage: ubuntu-16.04
           releaseName: "release_ubuntu"
+          archiveFileName: "x86_64_release_ubuntu"
         MacOS:
           vmImage: macOS-10.13
           releaseName: "release_darwin"
+          archiveFileName: "x86_64_release_darwin"
         Windows:
           vmImage: vs2017-win2016
           releaseName: "release_windows"
+          archiveFileName: "x86_64_release_windows"
     pool:
       vmImage: $(vmImage)
     steps:

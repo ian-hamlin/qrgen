@@ -13,9 +13,9 @@ steps:
   - task: ArchiveFiles@2
     displayName: Gather assets ${{ parameters.name }}
     inputs:
-      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)'
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/*'
       archiveType: 'zip'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/qrgen-macOS.tar.gz'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/${{ parameters.archiveFileName }}.zip'
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: ${{ parameters.name }}
