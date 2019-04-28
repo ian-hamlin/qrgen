@@ -19,6 +19,7 @@ jobs:
     - script: |
         cargo fmt --all -- --check
       displayName: Check formatting
+  
   - job: run_cargo_test
     displayName: "cargo test"
     dependsOn:
@@ -39,6 +40,7 @@ jobs:
         rust_version: stable
     - script: cargo test
       displayName: Cargo test
+  
   - job: create_binaries
     displayName: "Create release binaries"
     dependsOn:
@@ -47,13 +49,13 @@ jobs:
       matrix:
         Linux:
           vmImage: ubuntu-16.04
-          distName: "dist_ubuntu"
+          releaseName: "release_ubuntu"
         MacOS:
           vmImage: macOS-10.13
-          distName: "dist_darwin"
+          releaseName: "release_darwin"
         Windows:
           vmImage: vs2017-win2016
-          distName: "dist_windows"
+          releaseName: "release_windows"
     pool:
       vmImage: $(vmImage)
     steps:
@@ -64,4 +66,25 @@ jobs:
       displayName: cargo build release
     - template: ci/azure-publish-artifact.yml
       parameters:
-        name: $(distName)
+        name: $(releaseName)
+
+  - job: deploy_release
+    displayName: "Deploy release"
+    dependsOn:
+      - create_binaries
+    steps:
+      - task: DownloadPipelineArtifact@0
+        displayName: "Download release - ubuntu"
+        inputs:
+          artifactName: release_ubuntu
+          targetPath: tmp/ubuntu
+      - task: DownloadPipelineArtifact@0
+        displayName: "Download release - darwin"
+        inputs:
+          artifactName: release_darwin
+          targetPath: tmp/darwin
+      - task: DownloadPipelineArtifact@0
+        displayName: "Download release - windows"
+        inputs:
+          artifactName: release_windows
+          targetPath: tmp/windows
