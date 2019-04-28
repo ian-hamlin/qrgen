@@ -104,3 +104,13 @@ jobs:
           rootFolderOrFile: $(System.DefaultWorkingDirectory)/windows
           archiveType: 'zip'
           archiveFile: $(System.DefaultWorkingDirectory)/deploy/release_windows.zip'
+      - script: |
+          DATE="$(date +%Y-%m-%d)"
+          echo "##vso[task.setvariable variable=build.date]$DATE"
+        displayName: "Create date variable"
+      - script: |
+          MY_TAG="$(Build.SourceBranch)"
+          MY_TAG=${MY_TAG#refs/tags/}
+          echo $MY_TAG
+          echo "##vso[task.setvariable variable=build.my_tag]$MY_TAG"
+        displayName: "Create my tag variable"
