@@ -92,7 +92,7 @@ jobs:
         inputs:
           rootFolderOrFile: $(System.DefaultWorkingDirectory)/darwin
           archiveType: 'zip'
-          archiveFile: $(System.DefaultWorkingDirectory)/release_darwin.zip
+          archiveFile: $(System.DefaultWorkingDirectory)/release_macOS.zip
       - task: DownloadPipelineArtifact@0
         displayName: "Download release - windows"
         inputs:
