@@ -123,6 +123,6 @@ jobs:
           target: '$(build.sourceVersion)'
           tagSource: 'manual'
           tag: '$(build.my_tag)'
-          assets: '$(System.DefaultWorkingDirectory)/deploy/*/zip'
+          assets: '$(System.DefaultWorkingDirectory)/deploy/*.zip'
           title: '$(build.my_tag) - $(build.date)'
           assetUploadMode: 'replace'
