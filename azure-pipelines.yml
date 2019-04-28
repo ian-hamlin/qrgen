@@ -37,18 +37,33 @@ jobs:
         rust_version: stable
     - script: cargo test
       displayName: Cargo test
-
-# jobs:
-# # Check formatting
-# - template: ci/azure-rustfmt.yml
-#   parameters:
-#     name: rustfmt
-
-# # Test the app
-# - template: ci/azure-test-stable.yml
-#   parameters:
-#     name: test_qrgen
-#     displayName: Test qrgen
+  - job: create_binaries
+    displayName: "Create release binaries"
+    dependsOn:
+      - run_rustfmt
+      - run_cargo_test
+    strategy:
+      matrix:
+        Linux:
+          vmImage: ubuntu-16.04
+          distName: "dist_ubuntu"
+        MacOS:
+          vmImage: macOS-10.13
+          distName: "dist_darwin"
+        Windows:
+          vmImage: vs2017-win2016
+          distName: "dist_windows"
+    pool:
+      vmImage: $(vmImage)
+    steps:
+    - template: ci/azure-install-rust.yml
+      parameters:
+        rust_version: stable
+    - script: cargo build --release
+      displayName: cargo build release
+    - template: ci/azure-create-tarball.yml
+      parameters:
+        name: $(distName)
 
 # # Release Windows
 # - template: ci/azure-release.yml
