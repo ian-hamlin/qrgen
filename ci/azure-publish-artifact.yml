@@ -10,7 +10,13 @@ steps:
       rm -f ${{ parameters.artifacts }}/qrgen*.pdb
       cp ${{ parameters.artifacts }}/qrgen* $dst/
     displayName: Create artifacts
+  - task: ArchiveFiles@2
+    displayName: Zip artifacts
+    inputs:
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/*'
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/${{ parameters.releaseName }}.zip'
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: ${{ parameters.name }}
-      targetPath: '$(Build.ArtifactStagingDirectory)'
+      targetPath: '$(Build.ArtifactStagingDirectory)/*.zip'
