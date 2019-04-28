@@ -1,5 +1,8 @@
-trigger: ["master"]
-pr: ["master"]
+trigger:
+  branches:
+    include:
+      - refs/heads/master
+      - refs/tags/*
 
 jobs:
 # Check formatting
