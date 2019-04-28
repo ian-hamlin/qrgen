@@ -22,8 +22,6 @@ jobs:
   
   - job: run_cargo_test
     displayName: "cargo test"
-    dependsOn:
-      - run_rustfmt
     strategy:
       matrix:
         Linux:
@@ -43,8 +41,6 @@ jobs:
   
   - job: create_binaries
     displayName: "Create release binaries"
-    dependsOn:
-      - run_cargo_test
     strategy:
       matrix:
         Linux:
@@ -72,6 +68,8 @@ jobs:
     displayName: "Deploy release"
     dependsOn:
       - create_binaries
+      - run_rustfmt
+      - run_cargo_test
     steps:
       - task: DownloadPipelineArtifact@0
         displayName: "Download release - ubuntu"
