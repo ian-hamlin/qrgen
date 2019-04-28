@@ -86,3 +86,10 @@ jobs:
         inputs:
           artifactName: release_windows
           targetPath: tmp/windows
+      - task: ArchiveFiles@2
+        displayName: Gather darwin assets
+        inputs:
+          rootFolderOrFile: tmp/darwin
+          archiveType: 'tar'
+          tarCompression: 'gz'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/qrgen-macOS.tar.gz'
