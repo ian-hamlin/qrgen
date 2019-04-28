@@ -17,7 +17,7 @@ jobs:
     displayName: Test qrgen
 
   # Release
-- template: ci/azure-azure-release.yml
+- template: ci/azure-release.yml
   parameters:
     name: dist_windows
     displayName: "Distribute Windows binary"
