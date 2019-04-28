@@ -16,9 +16,16 @@ jobs:
     name: test_qrgen
     displayName: Test qrgen
 
-  # Release
+# Release Windows
 - template: ci/azure-release.yml
   parameters:
     name: dist_windows
-    displayName: "Distribute Windows binary"
+    displayName: "Distribute Windows Binary"
     vmImage: vs2017-win2016
+
+# Release Mac
+- template: ci/azure-release.yml
+  parameters:
+    name: dist_darwin
+    displayName: "Distribute Darwin Binary"
+    vmImage: macOS-10.13

@@ -8,6 +8,7 @@ jobs:
       parameters:
         rust_version: stable
     - script: cargo build --release
+      displayName: cargo build release
     - template: azure-create-tarball.yml
       parameters:
         name: ${{ parameters.name }}
