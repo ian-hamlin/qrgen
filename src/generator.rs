@@ -78,7 +78,7 @@ fn next_chunk<T>(chunk_size: usize, reader: &mut csv::Reader<T>) -> Option<Vec<c
 where
     T: std::io::Read,
 {
-    let mut chunks = Vec::new();
+    let mut chunks = Vec::with_capacity(chunk_size);
 
     for (total, result) in reader.records().enumerate() {
         match result {
