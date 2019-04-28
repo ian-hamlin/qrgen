@@ -29,3 +29,10 @@ jobs:
     name: dist_darwin
     displayName: "Distribute Darwin Binary"
     vmImage: macOS-10.13
+
+# Release Ubuntu
+- template: ci/azure-release.yml
+  parameters:
+    name: dist_ubuntu
+    displayName: "Distribute Ubuntu Binary"
+    vmImage: ubuntu-16.04
