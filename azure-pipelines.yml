@@ -46,15 +46,12 @@ jobs:
         Linux:
           vmImage: ubuntu-16.04
           releaseName: "release_ubuntu"
-          archiveFileName: "x86_64_release_ubuntu"
         MacOS:
           vmImage: macOS-10.13
           releaseName: "release_darwin"
-          archiveFileName: "x86_64_release_darwin"
         Windows:
           vmImage: vs2017-win2016
           releaseName: "release_windows"
-          archiveFileName: "x86_64_release_windows"
     pool:
       vmImage: $(vmImage)
     steps:
@@ -67,25 +64,31 @@ jobs:
       parameters:
         name: $(releaseName)
 
-  # - job: deploy_release
-  #   displayName: "Deploy release"
-  #   dependsOn:
-  #     - create_binaries
-  #     - run_rustfmt
-  #     - run_cargo_test
-  #   steps:
-  #     - task: DownloadPipelineArtifact@0
-  #       displayName: "Download release - ubuntu"
-  #       inputs:
-  #         artifactName: release_ubuntu
-  #         targetPath: $(System.DefaultWorkingDirectory)/ubuntu
-  #     - task: DownloadPipelineArtifact@0
-  #       displayName: "Download release - darwin"
-  #       inputs:
-  #         artifactName: release_darwin
-  #         targetPath: $(System.DefaultWorkingDirectory)/darwin
-  #     - task: DownloadPipelineArtifact@0
-  #       displayName: "Download release - windows"
-  #       inputs:
-  #         artifactName: release_windows
-  #         targetPath: $(System.DefaultWorkingDirectory)/windows
+  - job: deploy_release
+    displayName: "Deploy release"
+    dependsOn:
+      - create_binaries
+      - run_rustfmt
+      - run_cargo_test
+    steps:
+      - task: DownloadPipelineArtifact@0
+        displayName: "Download release - ubuntu"
+        inputs:
+          artifactName: release_ubuntu
+          targetPath: $(System.DefaultWorkingDirectory)/ubuntu
+      - task: ArchiveFiles@2
+        displayName: Gather assets release_ubuntu
+        inputs:
+          rootFolderOrFile: $(System.DefaultWorkingDirectory)/ubuntu
+          archiveType: 'zip'
+          archiveFile: $(System.DefaultWorkingDirectory)/release_ubuntu.zip'
+      - task: DownloadPipelineArtifact@0
+        displayName: "Download release - darwin"
+        inputs:
+          artifactName: release_darwin
+          targetPath: $(System.DefaultWorkingDirectory)/darwin
+      - task: DownloadPipelineArtifact@0
+        displayName: "Download release - windows"
+        inputs:
+          artifactName: release_windows
+          targetPath: $(System.DefaultWorkingDirectory)/windows

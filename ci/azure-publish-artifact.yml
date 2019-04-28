@@ -9,13 +9,7 @@ steps:
       rm -f ${{ parameters.artifacts }}/qrgen*.d
       rm -f ${{ parameters.artifacts }}/qrgen*.pdb
       cp ${{ parameters.artifacts }}/qrgen* $dst/
-    displayName: Create distribution tarball
-  - task: ArchiveFiles@2
-    displayName: Gather assets ${{ parameters.name }}
-    inputs:
-      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/*'
-      archiveType: 'zip'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/${{ parameters.archiveFileName }}.zip'
+    displayName: Create artifacts
   - task: PublishPipelineArtifact@0
     inputs:
       artifactName: ${{ parameters.name }}
