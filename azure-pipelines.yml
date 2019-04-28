@@ -21,6 +21,8 @@ jobs:
       displayName: Check formatting
   - job: run_cargo_test
     displayName: "cargo test"
+    dependsOn:
+      - run_rustfmt
     strategy:
       matrix:
         Linux:
@@ -40,7 +42,6 @@ jobs:
   - job: create_binaries
     displayName: "Create release binaries"
     dependsOn:
-      - run_rustfmt
       - run_cargo_test
     strategy:
       matrix:
@@ -64,24 +65,3 @@ jobs:
     - template: ci/azure-create-tarball.yml
       parameters:
         name: $(distName)
-
-# # Release Windows
-# - template: ci/azure-release.yml
-#   parameters:
-#     name: dist_windows
-#     displayName: "Distribute Windows Binary"
-#     vmImage: vs2017-win2016
-
-# # Release Mac
-# - template: ci/azure-release.yml
-#   parameters:
-#     name: dist_darwin
-#     displayName: "Distribute Darwin Binary"
-#     vmImage: macOS-10.13
-
-# # Release Ubuntu
-# - template: ci/azure-release.yml
-#   parameters:
-#     name: dist_ubuntu
-#     displayName: "Distribute Ubuntu Binary"
-#     vmImage: ubuntu-16.04
