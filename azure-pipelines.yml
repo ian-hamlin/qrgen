@@ -62,6 +62,6 @@ jobs:
         rust_version: stable
     - script: cargo build --release
       displayName: cargo build release
-    - template: ci/azure-create-tarball.yml
+    - template: ci/azure-publish-artifact.yml
       parameters:
         name: $(distName)
