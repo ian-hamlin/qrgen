@@ -3,7 +3,7 @@ mod settings;
 
 use env_logger::Env;
 use log::{debug, info};
-use qrcodegen::QrCodeEcc;
+use qrcodegen;
 use std::{env, ffi::OsStr, path::PathBuf};
 use structopt::StructOpt;
 
@@ -30,7 +30,7 @@ struct Opt {
         default_value = "1",
         parse(try_from_str = "parse_qr_version")
     )]
-    qr_version_min: u8,
+    qr_version_min: qrcodegen::Version,
 
     /// The maximum version number supported in the QR Code Model 2 standard, or 40 if not specified.
     #[structopt(
@@ -40,7 +40,7 @@ struct Opt {
         default_value = "40",
         parse(try_from_str = "parse_qr_version")
     )]
-    qr_version_max: u8,
+    qr_version_max: qrcodegen::Version,
 
     /// The error correction level used in this QR Code, or High if not specified.
     /// "Low" The QR Code can tolerate about  7% erroneous codewords.
@@ -54,7 +54,7 @@ struct Opt {
         default_value = "High",
         parse(try_from_str = "parse_qr_ecc")
     )]
-    error_correction: QrCodeEcc,
+    error_correction: qrcodegen::QrCodeEcc,
 
     /// The number of lines to try and process in parallel, if not specified defaults to 1 and file is processed line by
     /// line.
@@ -91,7 +91,7 @@ struct Opt {
         long = "mask",
         parse(try_from_str = "parse_qr_mask")
     )]
-    mask: Option<u8>,
+    mask: Option<qrcodegen::Mask>,
 }
 
 fn parse_output_directory(src: &OsStr) -> PathBuf {
@@ -102,36 +102,36 @@ fn parse_output_directory(src: &OsStr) -> PathBuf {
     PathBuf::from(src)
 }
 
-fn parse_qr_ecc(src: &str) -> Result<QrCodeEcc, String> {
+fn parse_qr_ecc(src: &str) -> Result<qrcodegen::QrCodeEcc, String> {
     let src = src.to_uppercase();
 
     match src.as_ref() {
-        "HIGH" => Ok(QrCodeEcc::High),
-        "LOW" => Ok(QrCodeEcc::Low),
-        "MEDIUM" => Ok(QrCodeEcc::Medium),
-        "QUARTILE" => Ok(QrCodeEcc::Quartile),
+        "HIGH" => Ok(qrcodegen::QrCodeEcc::High),
+        "LOW" => Ok(qrcodegen::QrCodeEcc::Low),
+        "MEDIUM" => Ok(qrcodegen::QrCodeEcc::Medium),
+        "QUARTILE" => Ok(qrcodegen::QrCodeEcc::Quartile),
         _ => Err(String::from(
             "QR Code error correction level must be either High, Quartile, Medium or Low.",
         )),
     }
 }
 
-fn parse_qr_version(src: &str) -> Result<u8, String> {
+fn parse_qr_version(src: &str) -> Result<qrcodegen::Version, String> {
     let input = src.parse::<u8>();
 
     match input {
-        Ok(x) if x > 0_u8 && x < 41_u8 => Ok(x),
+        Ok(x) if x > 0_u8 && x < 41_u8 => Ok(qrcodegen::Version::new(x)),
         _ => Err(String::from(
             "QR Code Model 2 version number must be between 1 and 40 inclusive.",
         )),
     }
 }
 
-fn parse_qr_mask(src: &str) -> Result<u8, String> {
+fn parse_qr_mask(src: &str) -> Result<qrcodegen::Mask, String> {
     let input = src.parse::<u8>();
 
     match input {
-        Ok(x) if x < 8_u8 => Ok(x),
+        Ok(x) if x < 8_u8 => Ok(qrcodegen::Mask::new(x)),
         _ => Err(String::from("QR mask must be between 1 and 7 inclusive.")),
     }
 }
@@ -146,18 +146,20 @@ fn parse_chunk_size(src: &str) -> Result<usize, String> {
 }
 
 impl Opt {
-    fn into_parts(self) -> (Vec<PathBuf>, settings::Settings) {
-        (
+    fn into_generator(self) -> generator::Generator {
+        generator::Generator::new(
             self.infile,
-            settings::Settings::new(
-                self.output,
+            generator::QrOpts::new(
                 self.qr_version_min,
                 self.qr_version_max,
                 self.error_correction,
+                self.mask,
+            ),
+            generator::GeneratorOpts::new(
+                self.output,
                 self.chunk_size,
                 self.has_headers,
                 self.border,
-                self.mask,
             ),
         )
     }
@@ -178,8 +180,7 @@ fn main() {
     }
 
     info!("qrgen start");
-    let (files, settings) = opt.into_parts();
-    debug!("Files {:?} | {}", files, settings);
-    generator::from_files(&files, settings);
+    let generator = opt.into_generator();
+    debug!("{}", generator);
     info!("qrgen end");
 }
