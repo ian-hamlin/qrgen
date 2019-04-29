@@ -25,7 +25,20 @@ impl Generator {
         }
     }
 
-    pub fn generate(&self) {}
+    pub fn generate(&self) {
+        trace!("enter generate");
+        for file_path in &self.files {
+            match &self.generate_file(file_path) {
+                Ok(_) => trace!("complete file {}", file_path.display()),
+                Err(e) => warn!("{:?}", e),
+            }
+        }
+    }
+
+    fn generate_file(&self, file_path: &PathBuf) -> Result<(), Box<Error>> {
+        info!("process file {}", file_path.display());
+        Ok(())
+    }
 }
 
 impl fmt::Display for Generator {
