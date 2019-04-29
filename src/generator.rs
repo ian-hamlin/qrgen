@@ -31,8 +31,10 @@ pub fn from_file(file_path: &PathBuf, settings: &settings::Settings) -> Result<(
 
     // Get the file as chunks.
     while let Some(chunks) = next_chunk(settings.chunk_size(), &mut reader) {
-        chunks.par_iter().for_each(|record| {
-            if record.len() >= 2 {
+        chunks
+            .par_iter()
+            .filter(|f| f.len() >= 2)
+            .for_each(|record| {
                 if let Some(qr) = generate_qr(&record[1], &settings) {
                     let res = write_svg(qr, &record[0], &settings);
                     if res.is_err() {
@@ -43,8 +45,7 @@ pub fn from_file(file_path: &PathBuf, settings: &settings::Settings) -> Result<(
                         );
                     }
                 }
-            }
-        });
+            });
     }
 
     Ok(())
