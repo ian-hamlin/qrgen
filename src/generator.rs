@@ -47,7 +47,6 @@ impl Generator {
     }
 
     fn qr_code(&self, record: &csv::StringRecord) -> Option<qrcodegen::QrCode> {
-        trace!("qr_code {:?}", record);
         let chars: Vec<char> = record[1].chars().collect();
         let segment = qrcodegen::QrSegment::make_segments(&chars);
 
@@ -61,7 +60,7 @@ impl Generator {
         ) {
             Ok(qr) => Some(qr),
             Err(e) => {
-                warn!("{:?}", e);
+                warn!("{:?} {:?}", e, record);
                 None
             }
         }
