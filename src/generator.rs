@@ -1,14 +1,8 @@
 use crate::chunker;
-use log::{info, trace, warn};
+use log::{trace, warn};
 use qrcodegen;
 use rayon::prelude::*;
-use std::{
-    error::Error,
-    fmt,
-    fs::{File, OpenOptions},
-    io::prelude::*,
-    path::PathBuf,
-};
+use std::{error::Error, fmt, fs::File, path::PathBuf};
 
 pub struct Generator {
     qr_opts: QrOpts,
@@ -28,19 +22,49 @@ impl Generator {
     pub fn generate(&self) {
         trace!("generate");
         for file_path in &self.files {
-            match &self.generate_file(file_path) {
+            match &self.process_file(file_path) {
                 Ok(_) => trace!("complete file {}", file_path.display()),
                 Err(e) => warn!("{:?}", e),
             }
         }
     }
 
-    fn generate_file(&self, file_path: &PathBuf) -> Result<(), Box<Error>> {
+    fn process_file(&self, file_path: &PathBuf) -> Result<(), Box<Error>> {
         trace!("process file {}", file_path.display());
         let reader = self.csv_reader(file_path)?;
-        let mut _chunks = chunker::Chunker::new(reader, self.generator_opts.chunk_size);
+        let chunks = chunker::Chunker::new(reader, self.generator_opts.chunk_size);
+
+        for chunk in chunks {
+            chunk
+                .par_iter()
+                .filter(|record| record.len() >= 2)
+                .for_each(|record| {
+                    self.qr_code(record);
+                });
+        }
 
         Ok(())
+    }
+
+    fn qr_code(&self, record: &csv::StringRecord) -> Option<qrcodegen::QrCode> {
+        trace!("qr_code {:?}", record);
+        let chars: Vec<char> = record[1].chars().collect();
+        let segment = qrcodegen::QrSegment::make_segments(&chars);
+
+        match qrcodegen::QrCode::encode_segments_advanced(
+            &segment,
+            self.qr_opts.error_correction,
+            self.qr_opts.qr_version_min,
+            self.qr_opts.qr_version_max,
+            self.qr_opts.mask,
+            true,
+        ) {
+            Ok(qr) => Some(qr),
+            Err(e) => {
+                warn!("{:?}", e);
+                None
+            }
+        }
     }
 
     fn csv_reader(&self, file_path: &PathBuf) -> Result<csv::Reader<File>, Box<Error>> {

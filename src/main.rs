@@ -2,7 +2,7 @@ mod chunker;
 mod generator;
 
 use env_logger::Env;
-use log::{debug, info};
+use log::{info, trace};
 use qrcodegen;
 use std::{env, ffi::OsStr, path::PathBuf};
 use structopt::StructOpt;
@@ -181,7 +181,7 @@ fn main() {
 
     info!("qrgen start");
     let generator = opt.into_generator();
-    debug!("{}", generator);
+    trace!("{}", generator);
     generator.generate();
     info!("qrgen end");
 }
