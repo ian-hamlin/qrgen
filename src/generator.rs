@@ -24,6 +24,8 @@ impl Generator {
             generator_opts,
         }
     }
+
+    pub fn generate(&self) {}
 }
 
 impl fmt::Display for Generator {

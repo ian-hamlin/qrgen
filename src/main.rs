@@ -182,5 +182,6 @@ fn main() {
     info!("qrgen start");
     let generator = opt.into_generator();
     debug!("{}", generator);
+    generator.generate();
     info!("qrgen end");
 }
