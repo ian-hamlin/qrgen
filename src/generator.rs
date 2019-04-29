@@ -1,4 +1,4 @@
-use crate::settings;
+use crate::chunker;
 use log::{info, trace, warn};
 use qrcodegen;
 use rayon::prelude::*;
@@ -26,7 +26,7 @@ impl Generator {
     }
 
     pub fn generate(&self) {
-        trace!("enter generate");
+        trace!("generate");
         for file_path in &self.files {
             match &self.generate_file(file_path) {
                 Ok(_) => trace!("complete file {}", file_path.display()),
@@ -36,8 +36,23 @@ impl Generator {
     }
 
     fn generate_file(&self, file_path: &PathBuf) -> Result<(), Box<Error>> {
-        info!("process file {}", file_path.display());
+        trace!("process file {}", file_path.display());
+        let reader = self.csv_reader(file_path)?;
+        let mut _chunks = chunker::Chunker::new(reader, self.generator_opts.chunk_size);
+
         Ok(())
+    }
+
+    fn csv_reader(&self, file_path: &PathBuf) -> Result<csv::Reader<File>, Box<Error>> {
+        trace!("csv_reader {}", file_path.display());
+
+        let file = File::open(file_path)?;
+
+        Ok(csv::ReaderBuilder::new()
+            .has_headers(self.generator_opts.has_headers)
+            .trim(csv::Trim::All)
+            .flexible(true)
+            .from_reader(file))
     }
 }
 

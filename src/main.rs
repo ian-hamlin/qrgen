@@ -1,5 +1,5 @@
+mod chunker;
 mod generator;
-mod settings;
 
 use env_logger::Env;
 use log::{debug, info};
