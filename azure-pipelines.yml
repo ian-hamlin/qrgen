@@ -79,7 +79,7 @@ jobs:
       - task: ArchiveFiles@2
         displayName: Gather assets release_ubuntu
         inputs:
-          rootFolderOrFile: $(System.DefaultWorkingDirectory)/ubuntu/*
+          rootFolderOrFile: $(System.DefaultWorkingDirectory)/ubuntu/
           archiveType: 'zip'
           archiveFile: $(System.DefaultWorkingDirectory)/release_ubuntu.zip
       - task: DownloadPipelineArtifact@0
@@ -90,7 +90,7 @@ jobs:
       - task: ArchiveFiles@2
         displayName: Gather assets release_darwin
         inputs:
-          rootFolderOrFile: $(System.DefaultWorkingDirectory)/darwin/*
+          rootFolderOrFile: $(System.DefaultWorkingDirectory)/darwin/
           archiveType: 'zip'
           archiveFile: $(System.DefaultWorkingDirectory)/release_macOS.zip
       - task: DownloadPipelineArtifact@0
@@ -101,7 +101,7 @@ jobs:
       - task: ArchiveFiles@2
         displayName: Gather assets release_windows
         inputs:
-          rootFolderOrFile: $(System.DefaultWorkingDirectory)/windows/*
+          rootFolderOrFile: $(System.DefaultWorkingDirectory)/windows/
           archiveType: 'zip'
           archiveFile: $(System.DefaultWorkingDirectory)/release_windows.zip
       - script: |
