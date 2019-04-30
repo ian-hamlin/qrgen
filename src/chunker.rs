@@ -38,6 +38,8 @@ impl<T: Read> Iterator for Chunker<T> {
             }
         }
 
+        // This assumes that at least 1 line in the chunk was valid.
+        // TODO - do something about this, what if the first chunk is all wrong?
         if chunks.is_empty() {
             return None;
         }
