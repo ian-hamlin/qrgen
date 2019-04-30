@@ -1,5 +1,4 @@
 mod chunker;
-mod formats;
 mod generator;
 
 use env_logger::Env;
@@ -102,7 +101,7 @@ struct Opt {
         default_value = "SVG",
         parse(try_from_str = "parse_qr_format")
     )]
-    format: formats::Formats,
+    format: generator::Formats,
 }
 
 fn parse_output_directory(src: &OsStr) -> PathBuf {
@@ -113,11 +112,11 @@ fn parse_output_directory(src: &OsStr) -> PathBuf {
     PathBuf::from(src)
 }
 
-fn parse_qr_format(src: &str) -> Result<formats::Formats, String> {
+fn parse_qr_format(src: &str) -> Result<generator::Formats, String> {
     let src = src.to_uppercase();
 
     match src.as_ref() {
-        "SVG" => Ok(formats::Formats::SVG),
+        "SVG" => Ok(generator::Formats::SVG),
         _ => Err(String::from("Format must be SVG.")),
     }
 }

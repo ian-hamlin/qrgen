@@ -1,9 +1,19 @@
 use crate::chunker;
-use crate::formats;
 use log::{trace, warn};
 use qrcodegen;
 use rayon::prelude::*;
-use std::{error::Error, fmt, fs::File, path::PathBuf};
+use std::{
+    error::Error,
+    fmt,
+    fs::{File, OpenOptions},
+    io::prelude::*,
+    path::PathBuf,
+};
+
+#[derive(Copy, Clone, Debug)]
+pub enum Formats {
+    SVG,
+}
 
 pub struct Generator {
     qr_opts: QrOpts,
@@ -83,13 +93,29 @@ impl Generator {
                 self.generator_opts.border,
                 qr,
                 self.generator_opts.format,
+                record[0].to_string(),
             )),
             Err(e) => Err(Box::new(e)),
         }
     }
 
     fn qr_code_write(qr_gen: GeneratedOutput) -> Result<(), Box<Error>> {
-        trace!("qr_code_write {}", qr_gen.output.display());
+        let svg = qr_gen.qr_code.to_svg_string(i32::from(qr_gen.border));
+
+        let mut qr_file_path = qr_gen.output;
+        qr_file_path.push(qr_gen.file_name);
+        qr_file_path.set_extension("svg");
+
+        trace!("Writing svg file {}", qr_file_path.display());
+
+        let mut writer = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .append(false)
+            .open(qr_file_path)?;
+        writer.write_all(svg.as_bytes())?;
+        writer.flush()?;
+
         Ok(())
     }
 }
@@ -149,7 +175,7 @@ pub struct GeneratorOpts {
     chunk_size: usize,
     has_headers: bool,
     border: u8,
-    format: formats::Formats,
+    format: Formats,
 }
 
 impl GeneratorOpts {
@@ -158,7 +184,7 @@ impl GeneratorOpts {
         chunk_size: usize,
         has_headers: bool,
         border: u8,
-        format: formats::Formats,
+        format: Formats,
     ) -> Self {
         GeneratorOpts {
             output,
@@ -174,7 +200,8 @@ pub struct GeneratedOutput {
     output: PathBuf,
     border: u8,
     qr_code: qrcodegen::QrCode,
-    format: formats::Formats,
+    _format: Formats,
+    file_name: String,
 }
 
 impl GeneratedOutput {
@@ -182,66 +209,15 @@ impl GeneratedOutput {
         output: PathBuf,
         border: u8,
         qr_code: qrcodegen::QrCode,
-        format: formats::Formats,
+        format: Formats,
+        file_name: String,
     ) -> Self {
         GeneratedOutput {
             output,
             border,
             qr_code,
-            format,
+            _format: format,
+            file_name,
         }
     }
 }
-
-// fn write_svg(
-//     qr: qrcodegen::QrCode,
-//     file_name: &str,
-//     settings: &settings::Settings,
-// ) -> Result<(), Box<Error>> {
-//     let svg = qr.to_svg_string(i32::from(settings.border()));
-
-//     let mut qr_file_path = PathBuf::from(&settings.output());
-//     qr_file_path.push(file_name);
-//     qr_file_path.set_extension("svg");
-
-//     trace!("Writing svg file {}", qr_file_path.display());
-
-//     let mut writer = OpenOptions::new()
-//         .write(true)
-//         .create(true)
-//         .append(false)
-//         .open(qr_file_path)?;
-//     writer.write_all(svg.as_bytes())?;
-//     writer.flush()?;
-
-//     Ok(())
-// }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     #[test]
-//     fn should_give_chunks() {
-//         let input = "12\n34\n56\n78\n90".as_bytes();
-//         let mut reader = csv::ReaderBuilder::new()
-//             .has_headers(false)
-//             .from_reader(input);
-
-//         let chunk = next_chunk(2, &mut reader).unwrap();
-//         assert_eq!(chunk.len(), 2);
-//         assert_eq!(csv::StringRecord::from(vec!["12"]), chunk[0]);
-//         assert_eq!(csv::StringRecord::from(vec!["34"]), chunk[1]);
-
-//         let chunk = next_chunk(2, &mut reader).unwrap();
-//         assert_eq!(chunk.len(), 2);
-//         assert_eq!(csv::StringRecord::from(vec!["56"]), chunk[0]);
-//         assert_eq!(csv::StringRecord::from(vec!["78"]), chunk[1]);
-
-//         let chunk = next_chunk(2, &mut reader).unwrap();
-//         assert_eq!(chunk.len(), 1);
-//         assert_eq!(csv::StringRecord::from(vec!["90"]), chunk[0]);
-
-//         assert_eq!(None, next_chunk(2, &mut reader));
-//     }
-// }
