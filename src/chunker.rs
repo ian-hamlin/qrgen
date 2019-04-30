@@ -44,3 +44,33 @@ impl<T: Read> Iterator for Chunker<T> {
         Some(chunks)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn should_give_chunks() {
+        let input = "12\n34\n56\n78\n90".as_bytes();
+        let reader = csv::ReaderBuilder::new()
+            .has_headers(false)
+            .from_reader(input);
+        let mut chunks = Chunker::new(reader, 2);
+
+        let chunk = chunks.next().unwrap();
+        assert_eq!(chunk.len(), 2);
+        assert_eq!(csv::StringRecord::from(vec!["12"]), chunk[0]);
+        assert_eq!(csv::StringRecord::from(vec!["34"]), chunk[1]);
+
+        let chunk = chunks.next().unwrap();
+        assert_eq!(chunk.len(), 2);
+        assert_eq!(csv::StringRecord::from(vec!["56"]), chunk[0]);
+        assert_eq!(csv::StringRecord::from(vec!["78"]), chunk[1]);
+
+        let chunk = chunks.next().unwrap();
+        assert_eq!(chunk.len(), 1);
+        assert_eq!(csv::StringRecord::from(vec!["90"]), chunk[0]);
+
+        assert_eq!(None, chunks.next());
+    }
+}
