@@ -1,4 +1,5 @@
 use crate::chunker;
+use crate::formats;
 use log::{trace, warn};
 use qrcodegen;
 use rayon::prelude::*;
@@ -42,7 +43,7 @@ impl Generator {
                     let res = self.encode(record).and_then(Self::qr_code_write);
                     if res.is_err() {
                         warn!(
-                            "Error generating for {} {:?}",
+                            "error generating for {} {:?}",
                             record[0].to_string(),
                             res.err()
                         );
@@ -81,6 +82,7 @@ impl Generator {
                 PathBuf::from(&self.generator_opts.output),
                 self.generator_opts.border,
                 qr,
+                self.generator_opts.format,
             )),
             Err(e) => Err(Box::new(e)),
         }
@@ -147,15 +149,23 @@ pub struct GeneratorOpts {
     chunk_size: usize,
     has_headers: bool,
     border: u8,
+    format: formats::Formats,
 }
 
 impl GeneratorOpts {
-    pub fn new(output: PathBuf, chunk_size: usize, has_headers: bool, border: u8) -> Self {
+    pub fn new(
+        output: PathBuf,
+        chunk_size: usize,
+        has_headers: bool,
+        border: u8,
+        format: formats::Formats,
+    ) -> Self {
         GeneratorOpts {
             output,
             chunk_size,
             has_headers,
             border,
+            format,
         }
     }
 }
@@ -164,59 +174,24 @@ pub struct GeneratedOutput {
     output: PathBuf,
     border: u8,
     qr_code: qrcodegen::QrCode,
+    format: formats::Formats,
 }
 
 impl GeneratedOutput {
-    fn new(output: PathBuf, border: u8, qr_code: qrcodegen::QrCode) -> Self {
+    fn new(
+        output: PathBuf,
+        border: u8,
+        qr_code: qrcodegen::QrCode,
+        format: formats::Formats,
+    ) -> Self {
         GeneratedOutput {
             output,
             border,
             qr_code,
+            format,
         }
     }
 }
-
-// pub fn from_files(files: &[PathBuf], settings: settings::Settings) {
-//     for file_path in files {
-//         match from_file(&file_path, &settings) {
-//             Ok(_) => trace!("complete file {}", file_path.display()),
-//             Err(e) => warn!("{:?}", e),
-//         }
-//     }
-// }
-
-// pub fn from_file(file_path: &PathBuf, settings: &settings::Settings) -> Result<(), Box<Error>> {
-//     info!("process file {}", file_path.display());
-
-//     // Open the file and reader.
-//     let file = File::open(file_path)?;
-//     let mut reader = csv::ReaderBuilder::new()
-//         .has_headers(settings.has_headers())
-//         .trim(csv::Trim::All)
-//         .flexible(true)
-//         .from_reader(file);
-
-//     // Get the file as chunks.
-//     while let Some(chunks) = next_chunk(settings.chunk_size(), &mut reader) {
-//         chunks
-//             .par_iter()
-//             .filter(|f| f.len() >= 2)
-//             .for_each(|record| {
-//                 if let Some(qr) = generate_qr(&record[1], &settings) {
-//                     let res = write_svg(qr, &record[0], &settings);
-//                     if res.is_err() {
-//                         warn!(
-//                             "Error generating for {} {:?}",
-//                             record[0].to_string(),
-//                             res.err()
-//                         );
-//                     }
-//                 }
-//             });
-//     }
-
-//     Ok(())
-// }
 
 // fn write_svg(
 //     qr: qrcodegen::QrCode,
@@ -240,51 +215,6 @@ impl GeneratedOutput {
 //     writer.flush()?;
 
 //     Ok(())
-// }
-
-// fn next_chunk<T>(chunk_size: usize, reader: &mut csv::Reader<T>) -> Option<Vec<csv::StringRecord>>
-// where
-//     T: std::io::Read,
-// {
-//     let mut chunks = Vec::with_capacity(chunk_size);
-
-//     for (total, result) in reader.records().enumerate() {
-//         match result {
-//             Ok(r) => chunks.push(r),
-//             Err(e) => warn!("{:?}", e),
-//         }
-
-//         // Exit reading at this stage if we reached the chunk size.
-//         if total == chunk_size - 1 {
-//             break;
-//         }
-//     }
-
-//     if chunks.is_empty() {
-//         return None;
-//     }
-
-//     Some(chunks)
-// }
-
-// fn generate_qr(data: &str, settings: &settings::Settings) -> Option<qrcodegen::QrCode> {
-//     let chars: Vec<char> = data.chars().collect();
-//     let segment = qrcodegen::QrSegment::make_segments(&chars);
-
-//     match qrcodegen::QrCode::encode_segments_advanced(
-//         &segment,
-//         settings.error_correction(),
-//         settings.qr_version_min(),
-//         settings.qr_version_max(),
-//         settings.mask(),
-//         true,
-//     ) {
-//         Ok(qr) => Some(qr),
-//         Err(e) => {
-//             warn!("{:?}", e);
-//             None
-//         }
-//     }
 // }
 
 // #[cfg(test)]

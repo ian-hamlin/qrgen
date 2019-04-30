@@ -1,5 +1,5 @@
 use csv;
-use log::{trace, warn};
+use log::warn;
 use std::io::Read;
 
 pub struct Chunker<T>
@@ -23,7 +23,6 @@ impl<T: Read> Iterator for Chunker<T> {
     type Item = Vec<csv::StringRecord>;
 
     fn next(&mut self) -> Option<Vec<csv::StringRecord>> {
-        trace!("iterator for Chunker<T>");
         let mut chunks = Vec::with_capacity(self.chunk_size);
 
         for (total, result) in self.inner.records().enumerate() {

@@ -29,7 +29,7 @@ The headers are optional, but the relevant flag will need to be passed to the to
 
 ```console
 USAGE:
-    qrgen [FLAGS] [OPTIONS] <infile>...
+    qrgen.exe [FLAGS] [OPTIONS] <infile>... --format <format>
 
 FLAGS:
     -s, --skip       A flag indicating if the first line of the CSV is a header and should be skipped, defaults to false
@@ -53,6 +53,7 @@ OPTIONS:
                                       tolerate about 15% erroneous codewords. "Quartile" The QR Code can tolerate about
                                       25% erroneous codewords. "High" The QR Code can tolerate about 30% erroneous
                                       codewords. [default: High]
+    -f, --format <format>             The target output format.  Defaults to SVG if not specified.
     -k, --mask <mask>                 The mask value to apply to the QR Code, between 0 and 7 (inclusive).
     -o, --output <output>             Output path, or current working directory if not specified or - provided.
                                       [default: -]

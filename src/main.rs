@@ -1,4 +1,5 @@
 mod chunker;
+mod formats;
 mod generator;
 
 use env_logger::Env;
@@ -92,6 +93,16 @@ struct Opt {
         parse(try_from_str = "parse_qr_mask")
     )]
     mask: Option<qrcodegen::Mask>,
+
+    /// The target output format.  Defaults to SVG if not specified.
+    #[structopt(
+        name = "format",
+        short = "f",
+        long = "format",
+        default_value = "SVG",
+        parse(try_from_str = "parse_qr_format")
+    )]
+    format: formats::Formats,
 }
 
 fn parse_output_directory(src: &OsStr) -> PathBuf {
@@ -100,6 +111,15 @@ fn parse_output_directory(src: &OsStr) -> PathBuf {
     }
 
     PathBuf::from(src)
+}
+
+fn parse_qr_format(src: &str) -> Result<formats::Formats, String> {
+    let src = src.to_uppercase();
+
+    match src.as_ref() {
+        "SVG" => Ok(formats::Formats::SVG),
+        _ => Err(String::from("Format must be SVG.")),
+    }
 }
 
 fn parse_qr_ecc(src: &str) -> Result<qrcodegen::QrCodeEcc, String> {
@@ -160,6 +180,7 @@ impl Opt {
                 self.chunk_size,
                 self.has_headers,
                 self.border,
+                self.format,
             ),
         )
     }
