@@ -39,31 +39,18 @@ impl Generator {
                 .par_iter()
                 .filter(|record| record.len() >= 2)
                 .for_each(|record| {
-                    self.qr_code(record);
+                    let res = self.encode(record).and_then(Self::qr_code_write);
+                    if res.is_err() {
+                        warn!(
+                            "Error generating for {} {:?}",
+                            record[0].to_string(),
+                            res.err()
+                        );
+                    }
                 });
         }
 
         Ok(())
-    }
-
-    fn qr_code(&self, record: &csv::StringRecord) -> Option<qrcodegen::QrCode> {
-        let chars: Vec<char> = record[1].chars().collect();
-        let segment = qrcodegen::QrSegment::make_segments(&chars);
-
-        match qrcodegen::QrCode::encode_segments_advanced(
-            &segment,
-            self.qr_opts.error_correction,
-            self.qr_opts.qr_version_min,
-            self.qr_opts.qr_version_max,
-            self.qr_opts.mask,
-            true,
-        ) {
-            Ok(qr) => Some(qr),
-            Err(e) => {
-                warn!("{:?} {:?}", e, record);
-                None
-            }
-        }
     }
 
     fn csv_reader(&self, file_path: &PathBuf) -> Result<csv::Reader<File>, Box<Error>> {
@@ -76,6 +63,32 @@ impl Generator {
             .trim(csv::Trim::All)
             .flexible(true)
             .from_reader(file))
+    }
+
+    fn encode(&self, record: &csv::StringRecord) -> Result<GeneratedOutput, Box<Error>> {
+        let chars: Vec<char> = record[1].chars().collect();
+        let segment = qrcodegen::QrSegment::make_segments(&chars);
+
+        match qrcodegen::QrCode::encode_segments_advanced(
+            &segment,
+            self.qr_opts.error_correction,
+            self.qr_opts.qr_version_min,
+            self.qr_opts.qr_version_max,
+            self.qr_opts.mask,
+            true,
+        ) {
+            Ok(qr) => Ok(GeneratedOutput::new(
+                PathBuf::from(&self.generator_opts.output),
+                self.generator_opts.border,
+                qr,
+            )),
+            Err(e) => Err(Box::new(e)),
+        }
+    }
+
+    fn qr_code_write(qr_gen: GeneratedOutput) -> Result<(), Box<Error>> {
+        trace!("qr_code_write {}", qr_gen.output.display());
+        Ok(())
     }
 }
 
@@ -143,6 +156,22 @@ impl GeneratorOpts {
             chunk_size,
             has_headers,
             border,
+        }
+    }
+}
+
+pub struct GeneratedOutput {
+    output: PathBuf,
+    border: u8,
+    qr_code: qrcodegen::QrCode,
+}
+
+impl GeneratedOutput {
+    fn new(output: PathBuf, border: u8, qr_code: qrcodegen::QrCode) -> Self {
+        GeneratedOutput {
+            output,
+            border,
+            qr_code,
         }
     }
 }
