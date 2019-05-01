@@ -72,8 +72,6 @@ impl Generator {
     }
 
     fn csv_reader(&self, file_path: &PathBuf) -> Result<csv::Reader<File>, Box<Error>> {
-        trace!("csv_reader {}", file_path.display());
-
         let file = File::open(file_path)?;
 
         Ok(csv::ReaderBuilder::new()
@@ -105,23 +103,34 @@ impl Generator {
     }
 
     fn save(qr_gen: QrOutput) -> Result<(), Box<Error>> {
-        let svg = qr_gen
-            .qr_code
-            .to_svg_string(i32::from(qr_gen.out_conf.border));
-
         let mut qr_file_path = qr_gen.out_conf.output;
         qr_file_path.push(qr_gen.file_name);
-        qr_file_path.set_extension("svg");
 
-        trace!("Writing svg file {}", qr_file_path.display());
+        match qr_gen.out_conf.format {
+            Formats::SVG => {
+                qr_file_path.set_extension("svg");
+                trace!("Writing svg file {}", qr_file_path.display());
+            }
+        }
 
-        let mut writer = OpenOptions::new()
+        let writer = OpenOptions::new()
             .write(true)
             .create(true)
             .append(false)
             .open(qr_file_path)?;
+
+        match qr_gen.out_conf.format {
+            Formats::SVG => Self::save_svg(writer, qr_gen.qr_code, qr_gen.out_conf.border),
+        }
+    }
+
+    fn save_svg<W: Write>(
+        mut writer: W,
+        qr_code: qrcodegen::QrCode,
+        border: u8,
+    ) -> Result<(), Box<Error>> {
+        let svg = qr_code.to_svg_string(i32::from(border));
         writer.write_all(svg.as_bytes())?;
-        writer.flush()?;
 
         Ok(())
     }
