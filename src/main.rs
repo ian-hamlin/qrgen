@@ -117,7 +117,8 @@ fn parse_qr_format(src: &str) -> Result<generator::Formats, String> {
 
     match src.as_ref() {
         "SVG" => Ok(generator::Formats::SVG),
-        _ => Err(String::from("Format must be SVG.")),
+        "PNG" => Ok(generator::Formats::PNG),
+        _ => Err(String::from("Format must be either SVG or PNG.")),
     }
 }
 

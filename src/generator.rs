@@ -13,6 +13,7 @@ use std::{
 #[derive(Copy, Clone, Debug)]
 pub enum Formats {
     SVG,
+    PNG,
 }
 
 pub struct Generator {
@@ -111,6 +112,10 @@ impl Generator {
                 qr_file_path.set_extension("svg");
                 trace!("Writing svg file {}", qr_file_path.display());
             }
+            Formats::PNG => {
+                qr_file_path.set_extension("png");
+                trace!("Writing png file {}", qr_file_path.display());
+            }
         }
 
         let writer = OpenOptions::new()
@@ -120,11 +125,20 @@ impl Generator {
             .open(qr_file_path)?;
 
         match qr_gen.out_conf.format {
-            Formats::SVG => Self::save_svg(writer, qr_gen.qr_code, qr_gen.out_conf.border),
+            Formats::SVG => Self::write_svg(writer, qr_gen.qr_code, qr_gen.out_conf.border),
+            Formats::PNG => Self::write_png(writer, qr_gen.qr_code, qr_gen.out_conf.border),
         }
     }
 
-    fn save_svg<W: Write>(
+    fn write_png<W: Write>(
+        mut _writer: W,
+        _qr_code: qrcodegen::QrCode,
+        _border: u8,
+    ) -> Result<(), Box<Error>> {
+        Ok(())
+    }
+
+    fn write_svg<W: Write>(
         mut writer: W,
         qr_code: qrcodegen::QrCode,
         border: u8,
