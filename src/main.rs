@@ -311,6 +311,21 @@ mod tests {
         );
     }
 
+    #[test]
+    fn should_parse_chunk_size_to_error() {
+        let res = parse_chunk_size("0").err();
+        assert_eq!(
+            Some("Chunk size must be a number greater than 0.".to_string()),
+            res
+        );
+    }
+
+    #[test]
+    fn should_parse_chunk_size() {
+        let res = parse_chunk_size("10").unwrap();
+        assert_eq!(10, res);
+    }
+
     macro_rules! parse_qr_mask_tests {
         ($($name:ident: $value:expr,)*) => {
         $(
