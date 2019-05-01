@@ -302,6 +302,38 @@ mod tests {
         );
     }
 
+    #[test]
+    fn should_parse_qr_mask_to_error_high() {
+        let res = parse_qr_mask("8").err();
+        assert_eq!(
+            Some("QR mask must be between 0 and 7 inclusive.".to_string()),
+            res
+        );
+    }
+
+    macro_rules! parse_qr_mask_tests {
+        ($($name:ident: $value:expr,)*) => {
+        $(
+            #[test]
+            fn $name() {
+                let (input, expected) = $value;
+                assert_eq!(expected, parse_qr_mask(input).unwrap().value());
+            }
+        )*
+        }
+    }
+
+    parse_qr_mask_tests! {
+        should_parse_qr_mask_0: ("0", 0),
+        should_parse_qr_mask_1: ("1", 1),
+        should_parse_qr_mask_2: ("2", 2),
+        should_parse_qr_mask_3: ("3", 3),
+        should_parse_qr_mask_4: ("4", 4),
+        should_parse_qr_mask_5: ("5", 5),
+        should_parse_qr_mask_6: ("6", 6),
+        should_parse_qr_mask_7: ("7", 7),
+    }
+
     macro_rules! parse_qr_version_tests {
         ($($name:ident: $value:expr,)*) => {
         $(
