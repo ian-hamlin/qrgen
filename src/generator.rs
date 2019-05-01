@@ -2,7 +2,6 @@ use crate::chunker;
 use log::{trace, warn};
 use qrcodegen;
 use rayon::prelude::*;
-use resvg::prelude::*;
 use std::{
     error::Error,
     fmt,
@@ -24,7 +23,6 @@ pub struct Generator {
 
 impl Generator {
     pub fn new(files: Vec<PathBuf>, qr_opts: QrOpts, generator_opts: GeneratorOpts) -> Self {
-        //let _resvg = resvg::init();
         Generator {
             files,
             qr_opts,
@@ -104,30 +102,19 @@ impl Generator {
     fn qr_code_write(qr_gen: GeneratedOutput) -> Result<(), Box<Error>> {
         let svg = qr_gen.qr_code.to_svg_string(i32::from(qr_gen.border));
 
-        // let mut qr_png_file_path = qr_gen.output;
-        // qr_png_file_path.push(qr_gen.file_name);
-        // qr_png_file_path.set_extension("png");
+        let mut qr_file_path = qr_gen.output;
+        qr_file_path.push(qr_gen.file_name);
+        qr_file_path.set_extension("svg");
 
-        // let tree = usvg::Tree::from_str(svg.as_str(), &usvg::Options::default()).unwrap();
-        // let backend = resvg::default_backend();
-        // let img = backend
-        //     .render_to_image(&tree, &resvg::Options::default())
-        //     .unwrap();
-        // img.save(qr_png_file_path.as_path());
+        trace!("Writing svg file {}", qr_file_path.display());
 
-        // let mut qr_file_path = qr_gen.output;
-        // qr_file_path.push(qr_gen.file_name);
-        // qr_file_path.set_extension("svg");
-
-        // trace!("Writing svg file {}", qr_file_path.display());
-
-        // let mut writer = OpenOptions::new()
-        //     .write(true)
-        //     .create(true)
-        //     .append(false)
-        //     .open(qr_file_path)?;
-        // writer.write_all(svg.as_bytes())?;
-        // writer.flush()?;
+        let mut writer = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .append(false)
+            .open(qr_file_path)?;
+        writer.write_all(svg.as_bytes())?;
+        writer.flush()?;
 
         Ok(())
     }
