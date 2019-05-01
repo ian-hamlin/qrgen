@@ -29,12 +29,13 @@ impl<T: Read> Iterator for Chunker<T> {
             match result {
                 Ok(r) => {
                     chunks.push(r);
-                    // Exit reading at this stage if we reached the chunk size.
-                    if total == self.chunk_size - 1 {
-                        break;
-                    }
                 }
                 Err(e) => warn!("{:?}", e),
+            }
+
+            // Exit reading at this stage if we reached the chunk size.
+            if total == self.chunk_size - 1 {
+                break;
             }
         }
 

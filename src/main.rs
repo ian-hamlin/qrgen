@@ -168,19 +168,14 @@ impl Opt {
     fn into_generator(self) -> generator::Generator {
         generator::Generator::new(
             self.infile,
-            generator::QrOpts::new(
+            generator::QrConfig::new(
                 self.qr_version_min,
                 self.qr_version_max,
                 self.error_correction,
                 self.mask,
             ),
-            generator::GeneratorOpts::new(
-                self.output,
-                self.chunk_size,
-                self.has_headers,
-                self.border,
-                self.format,
-            ),
+            generator::OutputConfig::new(self.output, self.border, self.format),
+            generator::ProcessingConfig::new(self.chunk_size, self.has_headers),
         )
     }
 }

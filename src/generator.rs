@@ -16,17 +16,24 @@ pub enum Formats {
 }
 
 pub struct Generator {
-    qr_opts: QrOpts,
-    generator_opts: GeneratorOpts,
+    qr_conf: QrConfig,
+    out_conf: OutputConfig,
+    proc_conf: ProcessingConfig,
     files: Vec<PathBuf>,
 }
 
 impl Generator {
-    pub fn new(files: Vec<PathBuf>, qr_opts: QrOpts, generator_opts: GeneratorOpts) -> Self {
+    pub fn new(
+        files: Vec<PathBuf>,
+        qr_conf: QrConfig,
+        out_conf: OutputConfig,
+        proc_conf: ProcessingConfig,
+    ) -> Self {
         Generator {
             files,
-            qr_opts,
-            generator_opts,
+            qr_conf,
+            out_conf,
+            proc_conf,
         }
     }
 
@@ -43,14 +50,14 @@ impl Generator {
     fn process_file(&self, file_path: &PathBuf) -> Result<(), Box<Error>> {
         trace!("process file {}", file_path.display());
         let reader = self.csv_reader(file_path)?;
-        let chunks = chunker::Chunker::new(reader, self.generator_opts.chunk_size);
+        let chunks = chunker::Chunker::new(reader, self.proc_conf.chunk_size);
 
         for chunk in chunks {
             chunk
                 .par_iter()
                 .filter(|record| record.len() >= 2)
                 .for_each(|record| {
-                    let res = self.encode(record).and_then(Self::qr_code_write);
+                    let res = self.encode(record).and_then(Self::save);
                     if res.is_err() {
                         warn!(
                             "error generating for {} {:?}",
@@ -70,7 +77,7 @@ impl Generator {
         let file = File::open(file_path)?;
 
         Ok(csv::ReaderBuilder::new()
-            .has_headers(self.generator_opts.has_headers)
+            .has_headers(self.proc_conf.has_headers)
             .trim(csv::Trim::All)
             .flexible(true)
             .from_reader(file))
@@ -82,24 +89,24 @@ impl Generator {
 
         match qrcodegen::QrCode::encode_segments_advanced(
             &segment,
-            self.qr_opts.error_correction,
-            self.qr_opts.qr_version_min,
-            self.qr_opts.qr_version_max,
-            self.qr_opts.mask,
+            self.qr_conf.error_correction,
+            self.qr_conf.qr_version_min,
+            self.qr_conf.qr_version_max,
+            self.qr_conf.mask,
             true,
         ) {
             Ok(qr) => Ok(GeneratedOutput::new(
-                PathBuf::from(&self.generator_opts.output),
-                self.generator_opts.border,
+                PathBuf::from(&self.out_conf.output),
+                self.out_conf.border,
                 qr,
-                self.generator_opts.format,
+                self.out_conf.format,
                 record[0].to_string(),
             )),
             Err(e) => Err(Box::new(e)),
         }
     }
 
-    fn qr_code_write(qr_gen: GeneratedOutput) -> Result<(), Box<Error>> {
+    fn save(qr_gen: GeneratedOutput) -> Result<(), Box<Error>> {
         let svg = qr_gen.qr_code.to_svg_string(i32::from(qr_gen.border));
 
         let mut qr_file_path = qr_gen.output;
@@ -124,44 +131,47 @@ impl fmt::Display for Generator {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "Output:{}, QR Version Min:{}, QR Version Max:{}, Error Correction: {}, Chunk Size:{}, \
-            Has CSV Header:{}, Border:{}, Mask:{}, Files: {:?}",
-            self.generator_opts.output.display(),
-            self.qr_opts.qr_version_min.value(),
-            self.qr_opts.qr_version_max.value(),
-            match self.qr_opts.error_correction {
+            "qr_conf = [QR Version Min:{}, QR Version Max:{}, Error Correction: {}, Mask:{}], \
+             proc_conf = [Chunk Size:{}, Has CSV Header:{}], \
+             out_conf: [Border:{}, Format: {:?}, Output: {}], \
+             input: Files: {:?}:",
+            self.qr_conf.qr_version_min.value(),
+            self.qr_conf.qr_version_max.value(),
+            match self.qr_conf.error_correction {
                 qrcodegen::QrCodeEcc::High => "High",
                 qrcodegen::QrCodeEcc::Low => "Low",
                 qrcodegen::QrCodeEcc::Quartile => "Quartile",
                 qrcodegen::QrCodeEcc::Medium => "Medium",
             },
-            self.generator_opts.chunk_size,
-            self.generator_opts.has_headers,
-            self.generator_opts.border,
-            match self.qr_opts.mask {
+            match self.qr_conf.mask {
                 Some(m) => m.value().to_string(),
                 _ => String::from("<Not Set>"),
             },
+            self.proc_conf.chunk_size,
+            self.proc_conf.has_headers,
+            self.out_conf.border,
+            self.out_conf.format,
+            self.out_conf.output.display(),
             self.files,
         )
     }
 }
 
-pub struct QrOpts {
+pub struct QrConfig {
     qr_version_min: qrcodegen::Version,
     qr_version_max: qrcodegen::Version,
     mask: Option<qrcodegen::Mask>,
     error_correction: qrcodegen::QrCodeEcc,
 }
 
-impl QrOpts {
+impl QrConfig {
     pub fn new(
         qr_version_min: qrcodegen::Version,
         qr_version_max: qrcodegen::Version,
         error_correction: qrcodegen::QrCodeEcc,
         mask: Option<qrcodegen::Mask>,
     ) -> Self {
-        QrOpts {
+        QrConfig {
             qr_version_min,
             qr_version_max,
             mask,
@@ -170,28 +180,32 @@ impl QrOpts {
     }
 }
 
-pub struct GeneratorOpts {
+pub struct OutputConfig {
     output: PathBuf,
-    chunk_size: usize,
-    has_headers: bool,
     border: u8,
     format: Formats,
 }
 
-impl GeneratorOpts {
-    pub fn new(
-        output: PathBuf,
-        chunk_size: usize,
-        has_headers: bool,
-        border: u8,
-        format: Formats,
-    ) -> Self {
-        GeneratorOpts {
+impl OutputConfig {
+    pub fn new(output: PathBuf, border: u8, format: Formats) -> Self {
+        OutputConfig {
             output,
-            chunk_size,
-            has_headers,
             border,
             format,
+        }
+    }
+}
+
+pub struct ProcessingConfig {
+    chunk_size: usize,
+    has_headers: bool,
+}
+
+impl ProcessingConfig {
+    pub fn new(chunk_size: usize, has_headers: bool) -> Self {
+        ProcessingConfig {
+            chunk_size,
+            has_headers,
         }
     }
 }
