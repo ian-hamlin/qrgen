@@ -201,3 +201,86 @@ fn main() {
     generator.generate();
     info!("qrgen end");
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn should_parse_output_directory_to_cwd() {
+        let expect = env::current_dir().unwrap();
+        let actual = parse_output_directory(OsStr::new("-"));
+
+        assert_eq!(expect, actual);
+    }
+
+    #[test]
+    fn should_parse_qr_format_to_png() {
+        let res = parse_qr_format("png").unwrap();
+        assert_eq!(generator::Formats::PNG, res);
+    }
+
+    #[test]
+    fn should_parse_qr_format_to_svg() {
+        let res = parse_qr_format("svg").unwrap();
+        assert_eq!(generator::Formats::SVG, res);
+    }
+
+    #[test]
+    fn should_parse_qr_format_to_error() {
+        let res = parse_qr_format("error").err();
+        assert_eq!(Some("Format must be either SVG or PNG.".to_string()), res);
+    }
+
+    #[test]
+    fn should_parse_qr_ecc_to_high() {
+        let res = parse_qr_ecc("high").unwrap();
+
+        match res {
+            qrcodegen::QrCodeEcc::High => {}
+            _ => panic!("unexpected ecc"),
+        }
+    }
+
+    #[test]
+    fn should_parse_qr_ecc_to_low() {
+        let res = parse_qr_ecc("low").unwrap();
+
+        match res {
+            qrcodegen::QrCodeEcc::Low => {}
+            _ => panic!("unexpected ecc"),
+        }
+    }
+
+    #[test]
+    fn should_parse_qr_ecc_to_medium() {
+        let res = parse_qr_ecc("medium").unwrap();
+
+        match res {
+            qrcodegen::QrCodeEcc::Medium => {}
+            _ => panic!("unexpected ecc"),
+        }
+    }
+
+    #[test]
+    fn should_parse_qr_ecc_to_quartile() {
+        let res = parse_qr_ecc("quartile").unwrap();
+
+        match res {
+            qrcodegen::QrCodeEcc::Quartile => {}
+            _ => panic!("unexpected ecc"),
+        }
+    }
+
+    #[test]
+    fn should_parse_qr_ecc_to_error() {
+        let res = parse_qr_ecc("error").err();
+        assert_eq!(
+            Some(
+                "QR Code error correction level must be either High, Quartile, Medium or Low."
+                    .to_string()
+            ),
+            res
+        );
+    }
+}

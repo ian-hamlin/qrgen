@@ -10,7 +10,7 @@ use std::{
     path::PathBuf,
 };
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Formats {
     SVG,
     PNG,
