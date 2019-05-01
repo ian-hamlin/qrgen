@@ -152,7 +152,7 @@ fn parse_qr_mask(src: &str) -> Result<qrcodegen::Mask, String> {
 
     match input {
         Ok(x) if x < 8_u8 => Ok(qrcodegen::Mask::new(x)),
-        _ => Err(String::from("QR mask must be between 1 and 7 inclusive.")),
+        _ => Err(String::from("QR mask must be between 0 and 7 inclusive.")),
     }
 }
 
@@ -283,4 +283,77 @@ mod tests {
             res
         );
     }
+
+    #[test]
+    fn should_parse_qr_version_to_error_low() {
+        let res = parse_qr_version("0").err();
+        assert_eq!(
+            Some("QR Code Model 2 version number must be between 1 and 40 inclusive.".to_string()),
+            res
+        );
+    }
+
+    #[test]
+    fn should_parse_qr_version_to_error_high() {
+        let res = parse_qr_version("41").err();
+        assert_eq!(
+            Some("QR Code Model 2 version number must be between 1 and 40 inclusive.".to_string()),
+            res
+        );
+    }
+
+    macro_rules! parse_qr_version_tests {
+        ($($name:ident: $value:expr,)*) => {
+        $(
+            #[test]
+            fn $name() {
+                let (input, expected) = $value;
+                assert_eq!(expected, parse_qr_version(input).unwrap().value());
+            }
+        )*
+        }
+    }
+
+    parse_qr_version_tests! {
+    should_parse_qr_version_1: ("1", 1),
+    should_parse_qr_version_2: ("2", 2),
+    should_parse_qr_version_3: ("3", 3),
+    should_parse_qr_version_4: ("4", 4),
+    should_parse_qr_version_5: ("5", 5),
+    should_parse_qr_version_6: ("6", 6),
+    should_parse_qr_version_7: ("7", 7),
+    should_parse_qr_version_8: ("8", 8),
+    should_parse_qr_version_9: ("9", 9),
+    should_parse_qr_version_10: ("10", 10),
+    should_parse_qr_version_11: ("11", 11),
+    should_parse_qr_version_12: ("12", 12),
+    should_parse_qr_version_13: ("13", 13),
+    should_parse_qr_version_14: ("14", 14),
+    should_parse_qr_version_15: ("15", 15),
+    should_parse_qr_version_16: ("16", 16),
+    should_parse_qr_version_17: ("17", 17),
+    should_parse_qr_version_18: ("18", 18),
+    should_parse_qr_version_19: ("19", 19),
+    should_parse_qr_version_20: ("20", 20),
+    should_parse_qr_version_21: ("21", 21),
+    should_parse_qr_version_22: ("22", 22),
+    should_parse_qr_version_23: ("23", 23),
+    should_parse_qr_version_24: ("24", 24),
+    should_parse_qr_version_25: ("25", 25),
+    should_parse_qr_version_26: ("26", 26),
+    should_parse_qr_version_27: ("27", 27),
+    should_parse_qr_version_28: ("28", 28),
+    should_parse_qr_version_29: ("29", 29),
+    should_parse_qr_version_30: ("30", 30),
+    should_parse_qr_version_31: ("31", 31),
+    should_parse_qr_version_32: ("32", 32),
+    should_parse_qr_version_33: ("33", 33),
+    should_parse_qr_version_34: ("34", 34),
+    should_parse_qr_version_35: ("35", 35),
+    should_parse_qr_version_36: ("36", 36),
+    should_parse_qr_version_37: ("37", 37),
+    should_parse_qr_version_38: ("38", 38),
+    should_parse_qr_version_39: ("39", 39),
+    should_parse_qr_version_40: ("40", 40),
+        }
 }
