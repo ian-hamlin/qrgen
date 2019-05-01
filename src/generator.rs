@@ -1,5 +1,6 @@
 use crate::chunker;
 use log::{trace, warn};
+use png::HasParameters;
 use qrcodegen;
 use rayon::prelude::*;
 use std::{
@@ -131,10 +132,36 @@ impl Generator {
     }
 
     fn write_png<W: Write>(
-        mut _writer: W,
-        _qr_code: qrcodegen::QrCode,
-        _border: u8,
+        writer: W,
+        qr_code: qrcodegen::QrCode,
+        border: u8,
     ) -> Result<(), Box<Error>> {
+        let scale = 1;
+
+        // Width and height adding the border and scale.
+        let width = (qr_code.size() + (border as i32 * 2)) * scale;
+        let height = (qr_code.size() + (border as i32 * 2)) * scale;
+
+        println!("{:?} x {:?}", width, width);
+
+        let mut encoder = png::Encoder::new(writer, width as u32, height as u32);
+        encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
+        let mut pngw = encoder.write_header().unwrap();
+        let data = [255, 0, 0, 255, 0, 0, 0, 255]; // An array containing a RGBA sequence. First pixel is red and second pixel is black.
+
+        println!("{:?}", 1 * ((1 as usize + 7) >> 3));
+
+        match pngw.write_image_data(&data) {
+            Err(e) => println!("{:?}", e),
+            _ => {}
+        }
+
+        // for x in 0..width {
+        //     for y in 0..height {
+        //         encoder.
+        //     }
+        // }
+
         Ok(())
     }
 
