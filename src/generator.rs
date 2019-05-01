@@ -83,7 +83,7 @@ impl Generator {
             .from_reader(file))
     }
 
-    fn encode(&self, record: &csv::StringRecord) -> Result<GeneratedOutput, Box<Error>> {
+    fn encode(&self, record: &csv::StringRecord) -> Result<QrOutput, Box<Error>> {
         let chars: Vec<char> = record[1].chars().collect();
         let segment = qrcodegen::QrSegment::make_segments(&chars);
 
@@ -95,21 +95,21 @@ impl Generator {
             self.qr_conf.mask,
             true,
         ) {
-            Ok(qr) => Ok(GeneratedOutput::new(
-                PathBuf::from(&self.out_conf.output),
-                self.out_conf.border,
+            Ok(qr) => Ok(QrOutput::new(
+                self.out_conf.clone(),
                 qr,
-                self.out_conf.format,
                 record[0].to_string(),
             )),
             Err(e) => Err(Box::new(e)),
         }
     }
 
-    fn save(qr_gen: GeneratedOutput) -> Result<(), Box<Error>> {
-        let svg = qr_gen.qr_code.to_svg_string(i32::from(qr_gen.border));
+    fn save(qr_gen: QrOutput) -> Result<(), Box<Error>> {
+        let svg = qr_gen
+            .qr_code
+            .to_svg_string(i32::from(qr_gen.out_conf.border));
 
-        let mut qr_file_path = qr_gen.output;
+        let mut qr_file_path = qr_gen.out_conf.output;
         qr_file_path.push(qr_gen.file_name);
         qr_file_path.set_extension("svg");
 
@@ -180,6 +180,7 @@ impl QrConfig {
     }
 }
 
+#[derive(Clone)]
 pub struct OutputConfig {
     output: PathBuf,
     border: u8,
@@ -210,27 +211,17 @@ impl ProcessingConfig {
     }
 }
 
-pub struct GeneratedOutput {
-    output: PathBuf,
-    border: u8,
+pub struct QrOutput {
+    out_conf: OutputConfig,
     qr_code: qrcodegen::QrCode,
-    _format: Formats,
     file_name: String,
 }
 
-impl GeneratedOutput {
-    fn new(
-        output: PathBuf,
-        border: u8,
-        qr_code: qrcodegen::QrCode,
-        format: Formats,
-        file_name: String,
-    ) -> Self {
-        GeneratedOutput {
-            output,
-            border,
+impl QrOutput {
+    fn new(out_conf: OutputConfig, qr_code: qrcodegen::QrCode, file_name: String) -> Self {
+        QrOutput {
+            out_conf,
             qr_code,
-            _format: format,
             file_name,
         }
     }
