@@ -121,6 +121,10 @@ user    0m16.928s
 sys     0m1.539s
 ```
 
+### Roadmap
+
+- [ ] Add support to control the module scale for PNG.
+- [ ] Add support zip the output at creation.
 
 [azure-badge]: https://dev.azure.com/morpork73/qrgen/_apis/build/status/ian-hamlin.qrgen?branchName=master
 [azure-url]: https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=1&branchName=master
