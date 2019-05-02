@@ -95,14 +95,14 @@ this can lead to speed improvements.
 ```console
 $ # macOS
 $  time ./qrgen wiktionary.csv -c 1000
-real	0m4.192s
-user	0m24.714s
-sys	0m2.047s
+real    0m4.192s
+user    0m24.714s
+sys     0m2.047s
 
 $ time ./qrgen wiktionary.csv
-real	0m18.590s
-user	0m16.928s
-sys	0m1.539s
+real    0m18.590s
+user    0m16.928s
+sys     0m1.539s
 
 ```
 
