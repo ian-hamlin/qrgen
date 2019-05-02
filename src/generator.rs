@@ -1,15 +1,9 @@
 use crate::chunker;
+use crate::exporter;
 use log::{trace, warn};
-use png::HasParameters;
 use qrcodegen;
 use rayon::prelude::*;
-use std::{
-    error::Error,
-    fmt,
-    fs::{File, OpenOptions},
-    io::prelude::*,
-    path::PathBuf,
-};
+use std::{error::Error, fmt, fs::File, path::PathBuf};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum Formats {
@@ -59,13 +53,22 @@ impl Generator {
                 .par_iter()
                 .filter(|record| record.len() >= 2)
                 .for_each(|record| {
-                    let res = self.encode(record).and_then(Self::save);
-                    if res.is_err() {
-                        warn!(
-                            "error generating for {} {:?}",
+                    if let Some(qr) = self.encode(record) {
+                        let mut exp = exporter::Exporter::new(
+                            qr,
+                            self.out_conf.output.clone(),
+                            self.out_conf.border,
+                            self.out_conf.format,
                             record[0].to_string(),
-                            res.err()
                         );
+                        let res = exp.export();
+                        if res.is_err() {
+                            warn!(
+                                "error generating for {} {:?}",
+                                record[0].to_string(),
+                                res.err()
+                            );
+                        }
                     }
                 });
         }
@@ -83,7 +86,7 @@ impl Generator {
             .from_reader(file))
     }
 
-    fn encode(&self, record: &csv::StringRecord) -> Result<QrOutput, Box<Error>> {
+    fn encode(&self, record: &csv::StringRecord) -> Option<qrcodegen::QrCode> {
         let chars: Vec<char> = record[1].chars().collect();
         let segment = qrcodegen::QrSegment::make_segments(&chars);
 
@@ -95,86 +98,65 @@ impl Generator {
             self.qr_conf.mask,
             true,
         ) {
-            Ok(qr) => Ok(QrOutput::new(
-                self.out_conf.clone(),
-                qr,
-                record[0].to_string(),
-            )),
-            Err(e) => Err(Box::new(e)),
-        }
-    }
-
-    fn save(qr_gen: QrOutput) -> Result<(), Box<Error>> {
-        let mut qr_file_path = qr_gen.out_conf.output;
-        qr_file_path.push(qr_gen.file_name);
-
-        match qr_gen.out_conf.format {
-            Formats::SVG => {
-                qr_file_path.set_extension("svg");
-                trace!("Writing svg file {}", qr_file_path.display());
-            }
-            Formats::PNG => {
-                qr_file_path.set_extension("png");
-                trace!("Writing png file {}", qr_file_path.display());
+            Ok(qr) => Some(qr),
+            Err(e) => {
+                warn!("error generating for {} {:?}", record[0].to_string(), e);
+                None
             }
         }
-
-        let writer = OpenOptions::new()
-            .write(true)
-            .create(true)
-            .append(false)
-            .open(qr_file_path)?;
-
-        match qr_gen.out_conf.format {
-            Formats::SVG => Self::write_svg(writer, qr_gen.qr_code, qr_gen.out_conf.border),
-            Formats::PNG => Self::write_png(writer, qr_gen.qr_code, qr_gen.out_conf.border),
-        }
     }
 
-    fn write_png<W: Write>(
-        writer: W,
-        qr_code: qrcodegen::QrCode,
-        border: u8,
-    ) -> Result<(), Box<Error>> {
-        let scale = 1;
+    // fn save(qr_gen: QrOutput) -> Result<(), Box<Error>> {
+    //     let writer = OpenOptions::new()
+    //         .write(true)
+    //         .create(true)
+    //         .append(false)
+    //         .open(qr_file_path)?;
 
-        // Width and height adding the border and scale.
-        let width = (qr_code.size() + (border as i32 * 2)) * scale;
-        let height = (qr_code.size() + (border as i32 * 2)) * scale;
+    //     match qr_gen.out_conf.format {
+    //         Formats::SVG => Self::write_svg(writer, qr_gen.qr_code, qr_gen.out_conf.border),
+    //         Formats::PNG => Self::write_png(writer, qr_gen.qr_code, qr_gen.out_conf.border),
+    //     }
+    // }
 
-        println!("{:?} x {:?}", width, width);
+    // fn write_png<W: Write>(
+    //     writer: W,
+    //     qr_code: qrcodegen::QrCode,
+    //     border: u8,
+    // ) -> Result<(), Box<Error>> {
+    //     // ToDo - set a scale from the opts.
+    //     let scale: u32 = 10;
 
-        let mut encoder = png::Encoder::new(writer, width as u32, height as u32);
-        encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
-        let mut pngw = encoder.write_header().unwrap();
-        let data = [255, 0, 0, 255, 0, 0, 0, 255]; // An array containing a RGBA sequence. First pixel is red and second pixel is black.
+    //     // Width and height adding the border and scale.
 
-        println!("{:?}", 1 * ((1 as usize + 7) >> 3));
+    //     // let x = (qr_code.size() as u32)
+    //     //     .checked_mul(u32::from(border) * 2)?
+    //     //     .checked_mul(scale);
 
-        match pngw.write_image_data(&data) {
-            Err(e) => println!("{:?}", e),
-            _ => {}
-        }
+    //     // let size = (qr_code.size() + (i32::from(border) * 2)) * scale;
+    //     // let size = size as u32;
 
-        // for x in 0..width {
-        //     for y in 0..height {
-        //         encoder.
-        //     }
-        // }
+    //     // println!("{:?} x {:?}", size, size);
 
-        Ok(())
-    }
+    //     // let mut encoder = png::Encoder::new(writer, size, size);
+    //     // encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
 
-    fn write_svg<W: Write>(
-        mut writer: W,
-        qr_code: qrcodegen::QrCode,
-        border: u8,
-    ) -> Result<(), Box<Error>> {
-        let svg = qr_code.to_svg_string(i32::from(border));
-        writer.write_all(svg.as_bytes())?;
+    //     // let mut writer = encoder.write_header()?;
+    //     // let data = vec![0_u8; (size * size * 3) as usize];
 
-        Ok(())
-    }
+    //     // match writer.write_image_data(&data) {
+    //     //     Err(e) => println!("{:?}", e),
+    //     //     _ => {}
+    //     // }
+
+    //     // for x in 0..width {
+    //     //     for y in 0..height {
+    //     //         encoder.
+    //     //     }
+    //     // }
+
+    //     Ok(())
+    // }
 }
 
 impl fmt::Display for Generator {
@@ -257,22 +239,6 @@ impl ProcessingConfig {
         ProcessingConfig {
             chunk_size,
             has_headers,
-        }
-    }
-}
-
-pub struct QrOutput {
-    out_conf: OutputConfig,
-    qr_code: qrcodegen::QrCode,
-    file_name: String,
-}
-
-impl QrOutput {
-    fn new(out_conf: OutputConfig, qr_code: qrcodegen::QrCode, file_name: String) -> Self {
-        QrOutput {
-            out_conf,
-            qr_code,
-            file_name,
         }
     }
 }
