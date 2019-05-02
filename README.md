@@ -99,12 +99,18 @@ real    0m4.192s
 user    0m24.714s
 sys     0m2.047s
 
+$ time ./qrgen wiktionary.csv -c 1000 -f png //PNG output is somewhat slower.
+
+real     2m0.353s
+user     12m57.677s
+sys     0m13.734s
+
 $ time ./qrgen wiktionary.csv
 real    0m18.590s
 user    0m16.928s
 sys     0m1.539s
-
 ```
+
 
 [azure-badge]: https://dev.azure.com/morpork73/qrgen/_apis/build/status/ian-hamlin.qrgen?branchName=master
 [azure-url]: https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=1&branchName=master

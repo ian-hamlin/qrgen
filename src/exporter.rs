@@ -81,10 +81,10 @@ impl Exporter {
         // ToDo - set a scale from the opts.
         let scale: i32 = 20;
 
-        // Get the size of the code. This is the base size before adding the borders and scale.
+        // Get the size of the code.
         let size = (qr_code.size() as u32).checked_size(scale, border);
 
-        // Multiple by three as RGB has 3 values.
+        // Multiple by three as RGB has 3 values to get the data length for the PNG library.
         let data_length = size.checked_length(3);
 
         if size.is_some() && data_length.is_some() {
@@ -100,8 +100,20 @@ impl Exporter {
             let mut offset = 0_usize;
             let border = i32::from(border);
 
-            for x in 0..size as i32 {
-                for y in 0..size as i32 {
+            // println!(
+            //     "version = {:?}, errorcorrectionlevel = {:?}, mask = {:?}",
+            //     qr_code.version().value(),
+            //     match qr_code.error_correction_level() {
+            //         qrcodegen::QrCodeEcc::High => "High",
+            //         qrcodegen::QrCodeEcc::Low => "Low",
+            //         qrcodegen::QrCodeEcc::Quartile => "Quartile",
+            //         qrcodegen::QrCodeEcc::Medium => "Medium",
+            //     },
+            //     qr_code.mask().value()
+            // );
+
+            for x in 0..(size as i32) {
+                for y in 0..(size as i32) {
                     if qr_code.get_module(x / scale - border, y / scale - border) {
                         data[offset] = 0;
                         data[offset + 1] = 0;
