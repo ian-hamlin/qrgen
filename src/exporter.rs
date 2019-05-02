@@ -79,7 +79,7 @@ impl Exporter {
         border: u8,
     ) -> Result<(), Box<Error>> {
         // ToDo - set a scale from the opts.
-        let scale: i32 = 20;
+        let scale: i32 = 1;
 
         // Get the size of the code.
         let size = (qr_code.size() as u32).checked_size(scale, border);
@@ -100,8 +100,8 @@ impl Exporter {
             let mut offset = 0_usize;
             let border = i32::from(border);
 
-            // println!(
-            //     "version = {:?}, errorcorrectionlevel = {:?}, mask = {:?}",
+            // log::debug!(
+            //     "version = {:?}, errorcorrectionlevel = {:?}, mask = {:?}, size = {}, data length = {}",
             //     qr_code.version().value(),
             //     match qr_code.error_correction_level() {
             //         qrcodegen::QrCodeEcc::High => "High",
@@ -109,7 +109,9 @@ impl Exporter {
             //         qrcodegen::QrCodeEcc::Quartile => "Quartile",
             //         qrcodegen::QrCodeEcc::Medium => "Medium",
             //     },
-            //     qr_code.mask().value()
+            //     qr_code.mask().value(),
+            //     size,
+            //     data_length,
             // );
 
             for x in 0..(size as i32) {
