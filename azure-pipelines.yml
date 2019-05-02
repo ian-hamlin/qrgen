@@ -150,3 +150,4 @@ jobs:
           assets: '$(System.DefaultWorkingDirectory)/*.zip'
           title: '$(build.my_tag) - $(build.date)'
           assetUploadMode: 'replace'
+          addChangeLog: false

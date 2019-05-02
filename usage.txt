@@ -1,4 +1,4 @@
-qrgen 0.1.0
+qrgen 0.2.0
 ian-hamlin <ian@ihamlin.co.uk>
 
 USAGE:
