@@ -5,12 +5,6 @@ use qrcodegen;
 use rayon::prelude::*;
 use std::{error::Error, fmt, fs::File, path::PathBuf};
 
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub enum Formats {
-    SVG,
-    PNG,
-}
-
 pub struct Generator {
     qr_conf: QrConfig,
     out_conf: OutputConfig,
@@ -216,11 +210,11 @@ impl QrConfig {
 pub struct OutputConfig {
     output: PathBuf,
     border: u8,
-    format: Formats,
+    format: exporter::ExportFormat,
 }
 
 impl OutputConfig {
-    pub fn new(output: PathBuf, border: u8, format: Formats) -> Self {
+    pub fn new(output: PathBuf, border: u8, format: exporter::ExportFormat) -> Self {
         OutputConfig {
             output,
             border,

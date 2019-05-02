@@ -1,13 +1,18 @@
-use crate::generator;
 use log::trace;
 use png::HasParameters;
 use std::{error::Error, fs::OpenOptions, io::prelude::*, path::PathBuf};
+
+#[derive(Copy, Clone, Debug, PartialEq)]
+pub enum ExportFormat {
+    SVG,
+    PNG,
+}
 
 pub struct Exporter {
     qr_code: qrcodegen::QrCode,
     output: PathBuf,
     border: u8,
-    format: generator::Formats,
+    format: ExportFormat,
     file_name: String,
 }
 
@@ -16,7 +21,7 @@ impl Exporter {
         qr_code: qrcodegen::QrCode,
         output: PathBuf,
         border: u8,
-        format: generator::Formats,
+        format: ExportFormat,
         file_name: String,
     ) -> Self {
         Exporter {
@@ -32,11 +37,11 @@ impl Exporter {
         self.output.push(&self.file_name);
 
         match self.format {
-            generator::Formats::SVG => {
+            ExportFormat::SVG => {
                 self.output.set_extension("svg");
                 trace!("Writing svg file {}", self.output.display());
             }
-            generator::Formats::PNG => {
+            ExportFormat::PNG => {
                 self.output.set_extension("png");
                 trace!("Writing png file {}", self.output.display());
             }
@@ -49,8 +54,8 @@ impl Exporter {
             .open(&self.output)?;
 
         match self.format {
-            generator::Formats::SVG => self.export_svg(writer, &self.qr_code, self.border),
-            generator::Formats::PNG => self.export_png(writer, &self.qr_code, self.border),
+            ExportFormat::SVG => self.export_svg(writer, &self.qr_code, self.border),
+            ExportFormat::PNG => self.export_png(writer, &self.qr_code, self.border),
         }?;
 
         Ok(())

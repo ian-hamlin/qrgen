@@ -102,7 +102,7 @@ struct Opt {
         default_value = "SVG",
         parse(try_from_str = "parse_qr_format")
     )]
-    format: generator::Formats,
+    format: exporter::ExportFormat,
 }
 
 fn parse_output_directory(src: &OsStr) -> PathBuf {
@@ -113,12 +113,12 @@ fn parse_output_directory(src: &OsStr) -> PathBuf {
     PathBuf::from(src)
 }
 
-fn parse_qr_format(src: &str) -> Result<generator::Formats, String> {
+fn parse_qr_format(src: &str) -> Result<exporter::ExportFormat, String> {
     let src = src.to_uppercase();
 
     match src.as_ref() {
-        "SVG" => Ok(generator::Formats::SVG),
-        "PNG" => Ok(generator::Formats::PNG),
+        "SVG" => Ok(exporter::ExportFormat::SVG),
+        "PNG" => Ok(exporter::ExportFormat::PNG),
         _ => Err(String::from("Format must be either SVG or PNG.")),
     }
 }
@@ -218,13 +218,13 @@ mod tests {
     #[test]
     fn should_parse_qr_format_to_png() {
         let res = parse_qr_format("png").unwrap();
-        assert_eq!(generator::Formats::PNG, res);
+        assert_eq!(exporter::ExportFormat::PNG, res);
     }
 
     #[test]
     fn should_parse_qr_format_to_svg() {
         let res = parse_qr_format("svg").unwrap();
-        assert_eq!(generator::Formats::SVG, res);
+        assert_eq!(exporter::ExportFormat::SVG, res);
     }
 
     #[test]
