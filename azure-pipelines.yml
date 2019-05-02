@@ -11,8 +11,6 @@ jobs:
         vmImage: ubuntu-16.04
     steps:
     - template: ci/azure-install-rust.yml
-      parameters:
-        rust_version: stable
     - script: |
         rustup component add rustfmt
       displayName: Install rustfmt
@@ -34,76 +32,99 @@ jobs:
       vmImage: $(vmImage)
     steps:
     - template: ci/azure-install-rust.yml
-      parameters:
-        rust_version: stable
     - script: cargo test
       displayName: Cargo test
   
-  - job: create_binaries
-    displayName: "Create release binaries"
-    strategy:
-      matrix:
-        Linux:
-          vmImage: ubuntu-16.04
-          releaseName: "release_ubuntu"
-        MacOS:
-          vmImage: macOS-10.13
-          releaseName: "release_darwin"
-        Windows:
-          vmImage: vs2017-win2016
-          releaseName: "release_windows"
+  - job: create_linux_binary
+    displayName: "Create release binaries for Linux"
     pool:
-      vmImage: $(vmImage)
+      vmImage: ubuntu-16.04
     steps:
-    - template: ci/azure-install-rust.yml
-      parameters:
-        rust_version: stable
-    - script: cargo build --release
-      displayName: cargo build release
-    - template: ci/azure-publish-artifact.yml
-      parameters:
-        name: $(releaseName)
+      - template: ci/azure-install-rust.yml  
+      - script: rustup target add x86_64-unknown-linux-musl
+        displayName: Add unknown linux target
+      - script: |
+          sudo apt update -y
+          sudo apt install musl-tools -y
+        displayName: "Install musl-tools"
+      - script: cargo build --target x86_64-unknown-linux-musl --release
+        displayName: cargo build
+      - template: ci/azure-publish-artifact.yml
+        parameters:
+          artifacts: target/x86_64-unknown-linux-musl/release
+          name: dist_linux        
+
+  - job: create_windows_binary
+    displayName: "Create release binaries for Windows"
+    pool:
+      vmImage: vs2017-win2016
+    steps:
+      - template: ci/azure-install-rust.yml  
+      - script: cargo build --release
+        displayName: cargo build
+      - template: ci/azure-publish-artifact.yml
+        parameters:
+          name: dist_windows                  
+
+  - job: create_macOS_binary
+    displayName: "Create release binaries for MacOS"
+    pool:
+      vmImage: macOS-10.13
+    steps:
+      - template: ci/azure-install-rust.yml  
+      - script: cargo build --release
+        env:
+          MACOSX_DEPLOYMENT_TARGET: 10.7        
+        displayName: cargo build
+      - template: ci/azure-publish-artifact.yml
+        parameters:
+          name: dist_macos  
 
   - job: deploy_release
     displayName: "Deploy release"
     dependsOn:
-      - create_binaries
       - run_rustfmt
       - run_cargo_test
+      - create_linux_binary      
+      - create_windows_binary  
+      - create_macOS_binary    
     steps:
       - task: DownloadPipelineArtifact@0
-        displayName: "Download release - ubuntu"
+        displayName: "Download release - Linux"
         inputs:
-          artifactName: release_ubuntu
-          targetPath: $(System.DefaultWorkingDirectory)/ubuntu
+          artifactName: dist_linux
+          targetPath: $(System.DefaultWorkingDirectory)/linux      
       - task: ArchiveFiles@2
-        displayName: Gather assets release_ubuntu
+        displayName: Gather assets Linux
         inputs:
-          rootFolderOrFile: $(System.DefaultWorkingDirectory)/ubuntu/
+          rootFolderOrFile: $(System.DefaultWorkingDirectory)/linux/qrgen
           archiveType: 'zip'
-          archiveFile: $(System.DefaultWorkingDirectory)/release_ubuntu.zip
+          archiveFile: $(System.DefaultWorkingDirectory)/x86_64-unknown-linux-musl.zip            
       - task: DownloadPipelineArtifact@0
-        displayName: "Download release - darwin"
+        displayName: "Download release - Windows"
         inputs:
-          artifactName: release_darwin
-          targetPath: $(System.DefaultWorkingDirectory)/darwin
+          artifactName: dist_windows
+          targetPath: $(System.DefaultWorkingDirectory)/windows      
       - task: ArchiveFiles@2
-        displayName: Gather assets release_darwin
+        displayName: Gather assets Windows
         inputs:
-          rootFolderOrFile: $(System.DefaultWorkingDirectory)/darwin/
+          rootFolderOrFile: $(System.DefaultWorkingDirectory)/windows/qrgen.exe
           archiveType: 'zip'
-          archiveFile: $(System.DefaultWorkingDirectory)/release_macOS.zip
+          archiveFile: $(System.DefaultWorkingDirectory)/x86_64-pc-windows-msvc.zip        
       - task: DownloadPipelineArtifact@0
-        displayName: "Download release - windows"
+        displayName: "Download release - MacOS"
         inputs:
-          artifactName: release_windows
-          targetPath: $(System.DefaultWorkingDirectory)/windows
+          artifactName: dist_macos
+          targetPath: $(System.DefaultWorkingDirectory)/macos      
       - task: ArchiveFiles@2
-        displayName: Gather assets release_windows
+        displayName: Gather assets MacOS
         inputs:
-          rootFolderOrFile: $(System.DefaultWorkingDirectory)/windows/
+          rootFolderOrFile: $(System.DefaultWorkingDirectory)/macos/qrgen
           archiveType: 'zip'
-          archiveFile: $(System.DefaultWorkingDirectory)/release_windows.zip
+          archiveFile: $(System.DefaultWorkingDirectory)/x86_64-apple-darwin.zip                    
+      - script: dir
+        workingDirectory: $(System.DefaultWorkingDirectory)
+        displayName: List contents of a folder 
       - script: |
           DATE="$(date +%Y-%m-%d)"
           echo "##vso[task.setvariable variable=build.date]$DATE"

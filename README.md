@@ -40,22 +40,23 @@ FLAGS:
     -v, --verbose    Verbose logging mode (-v, -vv, -vvv)
 
 OPTIONS:
-    -x, --max <QR version max>        The maximum version number supported in the QR Code Model 2 standard, or 40 if not
-                                      specified. [default: 40]
-    -m, --min <QR version min>        The minimum version number supported in the QR Code Model 2 standard, or 1 if not
-                                      specified. [default: 1]
-    -b, --border <border>             The size of the border on the generated QR Code, defaults to 4 if not specified.
-                                      [default: 4]
-    -c, --chunk <chunk size>          The number of lines to try and process in parallel, if not specified defaults to 1
-                                      and file is processed line by line. [default: 1]
-    -e, --error <error correction>    The error correction level used in this QR Code, or High if not specified. "Low"
-                                      The QR Code can tolerate about  7% erroneous codewords. "Medium" The QR Code can
-                                      tolerate about 15% erroneous codewords. "Quartile" The QR Code can tolerate about
-                                      25% erroneous codewords. "High" The QR Code can tolerate about 30% erroneous
-                                      codewords. [default: High]
-    -k, --mask <mask>                 The mask value to apply to the QR Code, between 0 and 7 (inclusive).
-    -o, --output <output>             Output path, or current working directory if not specified or - provided.
-                                      [default: -]
+    -f, --format <Output format type>    The target output format.  Defaults to SVG if not specified. [default: SVG]
+    -x, --max <QR version max>           The maximum version number supported in the QR Code Model 2 standard, or 40 if
+                                         not specified. [default: 40]
+    -m, --min <QR version min>           The minimum version number supported in the QR Code Model 2 standard, or 1 if
+                                         not specified. [default: 1]
+    -b, --border <border>                The size of the border on the generated QR Code, defaults to 4 if not
+                                         specified. [default: 4]
+    -c, --chunk <chunk size>             The number of lines to try and process in parallel, if not specified defaults
+                                         to 1 and file is processed line by line. [default: 1]
+    -e, --error <error correction>       The error correction level used in this QR Code, or High if not specified.
+                                         "Low" The QR Code can tolerate about  7% erroneous codewords. "Medium" The QR
+                                         Code can tolerate about 15% erroneous codewords. "Quartile" The QR Code can
+                                         tolerate about 25% erroneous codewords. "High" The QR Code can tolerate about
+                                         30% erroneous codewords. [default: High]
+    -k, --mask <mask>                    The mask value to apply to the QR Code, between 0 and 7 (inclusive).
+    -o, --output <output>                Output path, or current working directory if not specified or - provided.
+                                         [default: -]
 
 ARGS:
     <infile>...    Input file, must be specified.
@@ -94,16 +95,22 @@ this can lead to speed improvements.
 ```console
 $ # macOS
 $  time ./qrgen wiktionary.csv -c 1000
-real	0m4.192s
-user	0m24.714s
-sys	0m2.047s
+real    0m4.192s
+user    0m24.714s
+sys     0m2.047s
+
+$ time ./qrgen wiktionary.csv -c 1000 -f png //PNG output is somewhat slower.
+
+real     2m0.353s
+user     12m57.677s
+sys     0m13.734s
 
 $ time ./qrgen wiktionary.csv
-real	0m18.590s
-user	0m16.928s
-sys	0m1.539s
-
+real    0m18.590s
+user    0m16.928s
+sys     0m1.539s
 ```
+
 
 [azure-badge]: https://dev.azure.com/morpork73/qrgen/_apis/build/status/ian-hamlin.qrgen?branchName=master
 [azure-url]: https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=1&branchName=master
