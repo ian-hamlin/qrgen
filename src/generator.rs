@@ -99,58 +99,6 @@ impl Generator {
             }
         }
     }
-
-    // fn save(qr_gen: QrOutput) -> Result<(), Box<Error>> {
-    //     let writer = OpenOptions::new()
-    //         .write(true)
-    //         .create(true)
-    //         .append(false)
-    //         .open(qr_file_path)?;
-
-    //     match qr_gen.out_conf.format {
-    //         Formats::SVG => Self::write_svg(writer, qr_gen.qr_code, qr_gen.out_conf.border),
-    //         Formats::PNG => Self::write_png(writer, qr_gen.qr_code, qr_gen.out_conf.border),
-    //     }
-    // }
-
-    // fn write_png<W: Write>(
-    //     writer: W,
-    //     qr_code: qrcodegen::QrCode,
-    //     border: u8,
-    // ) -> Result<(), Box<Error>> {
-    //     // ToDo - set a scale from the opts.
-    //     let scale: u32 = 10;
-
-    //     // Width and height adding the border and scale.
-
-    //     // let x = (qr_code.size() as u32)
-    //     //     .checked_mul(u32::from(border) * 2)?
-    //     //     .checked_mul(scale);
-
-    //     // let size = (qr_code.size() + (i32::from(border) * 2)) * scale;
-    //     // let size = size as u32;
-
-    //     // println!("{:?} x {:?}", size, size);
-
-    //     // let mut encoder = png::Encoder::new(writer, size, size);
-    //     // encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
-
-    //     // let mut writer = encoder.write_header()?;
-    //     // let data = vec![0_u8; (size * size * 3) as usize];
-
-    //     // match writer.write_image_data(&data) {
-    //     //     Err(e) => println!("{:?}", e),
-    //     //     _ => {}
-    //     // }
-
-    //     // for x in 0..width {
-    //     //     for y in 0..height {
-    //     //         encoder.
-    //     //     }
-    //     // }
-
-    //     Ok(())
-    // }
 }
 
 impl fmt::Display for Generator {
