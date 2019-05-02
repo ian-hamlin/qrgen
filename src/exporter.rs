@@ -14,6 +14,7 @@ pub struct Exporter {
     border: u8,
     format: ExportFormat,
     file_name: String,
+    pixels: u8,
 }
 
 impl Exporter {
@@ -23,6 +24,7 @@ impl Exporter {
         border: u8,
         format: ExportFormat,
         file_name: String,
+        pixels: u8,
     ) -> Self {
         Exporter {
             qr_code,
@@ -30,6 +32,7 @@ impl Exporter {
             border,
             format,
             file_name,
+            pixels,
         }
     }
 
@@ -55,7 +58,7 @@ impl Exporter {
 
         match self.format {
             ExportFormat::SVG => self.export_svg(writer, &self.qr_code, self.border),
-            ExportFormat::PNG => self.export_png(writer, &self.qr_code, self.border),
+            ExportFormat::PNG => self.export_png(writer, &self.qr_code, self.border, self.pixels),
         }?;
 
         Ok(())
@@ -77,9 +80,10 @@ impl Exporter {
         writer: W,
         qr_code: &qrcodegen::QrCode,
         border: u8,
+        pixels: u8,
     ) -> Result<(), Box<Error>> {
         // ToDo - set a scale from the opts.
-        let scale: i32 = 1;
+        let scale: i32 = i32::from(pixels);
 
         // Get the size of the code.
         let size = (qr_code.size() as u32).checked_size(scale, border);

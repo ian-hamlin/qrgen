@@ -67,6 +67,7 @@ OPTIONS:
     -k, --mask <mask>                    The mask value to apply to the QR Code, between 0 and 7 (inclusive).
     -o, --output <output>                Output path, or current working directory if not specified or - provided.
                                          [default: -]
+    -p, --pixels <pixels>                The module scale to render each block as defaults to 8. [default: 8]
 
 ARGS:
     <infile>...    Input file, must be specified.
