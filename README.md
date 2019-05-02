@@ -2,7 +2,7 @@
 [![MIT licensed][license-badge]][license-url]
 [![dependency status][dependency-badge]][dependency-url]
 
-# About
+## About
 
 A simple command line tool to bulk-generate QR Codes from one or more CSV files.
 
@@ -11,6 +11,16 @@ Allows control over the following QR configuration options:
 * QR max and min version
 * Error correction level
 * Mask
+
+### Latest Release
+
+[Latest Release Page][latest-release]
+
+#### Downloads
+
+* [x86_64-apple-darwin.zip][mac-release]
+* [x86_64-pc-windows-msvc.zip][windows-release]
+* [x86_64-unknown-linux-musl.zip][linux-release]
 
 ## Description
 
@@ -118,3 +128,7 @@ sys     0m1.539s
 [license-url]: LICENSE
 [dependency-badge]: https://deps.rs/repo/github/ian-hamlin/qrgen/status.svg
 [dependency-url]: https://deps.rs/repo/github/ian-hamlin/qrgen
+[latest-release]: https://github.com/ian-hamlin/qrgen/releases/latest
+[mac-release]: https://github.com/ian-hamlin/qrgen/releases/latest/download/x86_64-apple-darwin.zip
+[windows-release]: https://github.com/ian-hamlin/qrgen/releases/latest/download/x86_64-pc-windows-msvc.zip
+[linux-release]: https://github.com/ian-hamlin/qrgen/releases/latest/download/x86_64-unknown-linux-musl.zip
