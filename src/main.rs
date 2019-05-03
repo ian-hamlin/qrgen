@@ -104,9 +104,10 @@ struct Opt {
     )]
     format: exporter::ExportFormat,
 
-    /// The module scale to render each block as defaults to 8.
-    #[structopt(short = "p", long = "pixels", default_value = "8")]
-    pixels: u8,
+    /// The side length (measured in pixels, must be positive) of each module, defaults to 8.  
+    /// This value only applies when using the PNG format.
+    #[structopt(short = "a", long = "scale", default_value = "8")]
+    scale: u8,
 }
 
 fn parse_output_directory(src: &OsStr) -> PathBuf {
@@ -180,7 +181,7 @@ impl Opt {
                 self.error_correction,
                 self.mask,
             ),
-            generator::OutputConfig::new(self.output, self.border, self.format, self.pixels),
+            generator::OutputConfig::new(self.output, self.border, self.format, self.scale),
             generator::ProcessingConfig::new(self.chunk_size, self.has_headers),
         )
     }

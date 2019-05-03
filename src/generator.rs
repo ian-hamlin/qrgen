@@ -54,7 +54,7 @@ impl Generator {
                             self.out_conf.border,
                             self.out_conf.format,
                             record[0].to_string(),
-                            self.out_conf.pixels,
+                            self.out_conf.scale,
                         );
                         let res = exp.export();
                         if res.is_err() {
@@ -174,16 +174,16 @@ pub struct OutputConfig {
     output: PathBuf,
     border: u8,
     format: exporter::ExportFormat,
-    pixels: u8,
+    scale: u8,
 }
 
 impl OutputConfig {
-    pub fn new(output: PathBuf, border: u8, format: exporter::ExportFormat, pixels: u8) -> Self {
+    pub fn new(output: PathBuf, border: u8, format: exporter::ExportFormat, scale: u8) -> Self {
         OutputConfig {
             output,
             border,
             format,
-            pixels,
+            scale,
         }
     }
 }
