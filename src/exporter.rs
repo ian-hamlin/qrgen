@@ -141,6 +141,7 @@ impl Exporter {
                 .tuple_combinations::<(i32, i32)>()
                 .chain((0..size as i32).zip(0..size as i32));
             for point in points {
+                // TODO - I can probably make this into a macro?
                 let y = point.0;
                 let x = point.1;
                 let offset = offset_fn(x, y, size, colour_type_samples);
