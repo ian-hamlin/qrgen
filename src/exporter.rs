@@ -205,6 +205,30 @@ mod tests {
     use super::*;
 
     #[test]
+    fn checked_length_should_return_none_for_large_colour_depth() {
+        let s = Some(1_i32);
+        let res = s.checked_length(usize::max_value());
+
+        assert_eq!(None, res);
+    }
+
+    #[test]
+    fn checked_length_should_return_none_for_large_self() {
+        let s = Some(i32::max_value());
+        let res = s.checked_length(2_usize);
+
+        assert_eq!(None, res);
+    }
+
+    #[test]
+    fn checked_length_should_return_none() {
+        let s = Some(22);
+        let res = s.checked_length(i32::max_value() as usize);
+
+        assert_eq!(None, res);
+    }
+
+    #[test]
     fn checked_size_should_return_none_for_large_border() {
         let s = Some(1_i32);
         let res = s.checked_size(1_i32, i32::max_value());
