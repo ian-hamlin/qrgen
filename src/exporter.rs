@@ -104,19 +104,19 @@ impl Exporter {
             let mut offset = 0_usize;
             let border = i32::from(border);
 
-            // log::debug!(
-            //     "version = {:?}, errorcorrectionlevel = {:?}, mask = {:?}, size = {}, data length = {}",
-            //     qr_code.version().value(),
-            //     match qr_code.error_correction_level() {
-            //         qrcodegen::QrCodeEcc::High => "High",
-            //         qrcodegen::QrCodeEcc::Low => "Low",
-            //         qrcodegen::QrCodeEcc::Quartile => "Quartile",
-            //         qrcodegen::QrCodeEcc::Medium => "Medium",
-            //     },
-            //     qr_code.mask().value(),
-            //     size,
-            //     data_length,
-            // );
+            log::debug!(
+                "version = {:?}, errorcorrectionlevel = {:?}, mask = {:?}, size = {}, data length = {}",
+                qr_code.version().value(),
+                match qr_code.error_correction_level() {
+                    qrcodegen::QrCodeEcc::High => "High",
+                    qrcodegen::QrCodeEcc::Low => "Low",
+                    qrcodegen::QrCodeEcc::Quartile => "Quartile",
+                    qrcodegen::QrCodeEcc::Medium => "Medium",
+                },
+                qr_code.mask().value(),
+                size,
+                data_length,
+            );
 
             for x in 0..(size as i32) {
                 for y in 0..(size as i32) {

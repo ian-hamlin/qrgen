@@ -85,6 +85,20 @@ impl Generator {
         let chars: Vec<char> = record[1].chars().collect();
         let segment = qrcodegen::QrSegment::make_segments(&chars);
 
+        for s in segment.iter() {
+            trace!(
+                "encoding mode = {:?},  character count = {:?}",
+                match s.mode() {
+                    qrcodegen::QrSegmentMode::Alphanumeric => "Alphanumeric",
+                    qrcodegen::QrSegmentMode::Byte => "Byte",
+                    qrcodegen::QrSegmentMode::Eci => "Eci",
+                    qrcodegen::QrSegmentMode::Kanji => "Kanji",
+                    qrcodegen::QrSegmentMode::Numeric => "AlphanNumericumeric",
+                },
+                s.num_chars()
+            );
+        }
+
         match qrcodegen::QrCode::encode_segments_advanced(
             &segment,
             self.qr_conf.error_correction,
