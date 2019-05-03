@@ -108,7 +108,7 @@ impl Exporter {
         // Get the size of the code.
         let size = Some(qr_code.size()).checked_size(scale, border);
 
-        // Multiple by three as RGB has 3 values to get the data length for the PNG library.
+        // Multiple by the colour sample length.
         let data_length = size.checked_length(colour_type_samples);
 
         if size.is_some() && data_length.is_some() {
