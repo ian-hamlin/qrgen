@@ -16,6 +16,7 @@ struct Opt {
 
     /// Output path, or current working directory if not specified or - provided.
     #[structopt(
+        name = "output path",
         short = "o",
         long = "output",
         default_value = "-",
@@ -49,7 +50,7 @@ struct Opt {
     /// "Quartile" The QR Code can tolerate about 25% erroneous codewords.
     /// "High" The QR Code can tolerate about 30% erroneous codewords.
     #[structopt(
-        name = "error correction",
+        name = "error correction level",
         short = "e",
         long = "error",
         default_value = "High",
