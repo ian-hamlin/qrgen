@@ -71,6 +71,19 @@ impl Exporter {
         border: u8,
     ) -> Result<(), Box<Error>> {
         let svg = qr_code.to_svg_string(i32::from(border));
+
+        trace!(
+            "version = {:?}, errorcorrectionlevel = {:?}, mask = {:?}",
+            qr_code.version().value(),
+            match qr_code.error_correction_level() {
+                qrcodegen::QrCodeEcc::High => "High",
+                qrcodegen::QrCodeEcc::Low => "Low",
+                qrcodegen::QrCodeEcc::Quartile => "Quartile",
+                qrcodegen::QrCodeEcc::Medium => "Medium",
+            },
+            qr_code.mask().value(),
+        );
+
         writer.write_all(svg.as_bytes())?;
         Ok(())
     }
@@ -104,7 +117,7 @@ impl Exporter {
             let mut offset = 0_usize;
             let border = i32::from(border);
 
-            log::debug!(
+            trace!(
                 "version = {:?}, errorcorrectionlevel = {:?}, mask = {:?}, size = {}, data length = {}",
                 qr_code.version().value(),
                 match qr_code.error_correction_level() {
