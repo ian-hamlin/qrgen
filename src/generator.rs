@@ -28,7 +28,6 @@ impl Generator {
     }
 
     pub fn generate(&self) {
-        trace!("generate");
         for file_path in &self.files {
             match &self.process_file(file_path) {
                 Ok(_) => trace!("complete file {}", file_path.display()),
