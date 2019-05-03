@@ -96,7 +96,6 @@ impl Exporter {
         border: u8,
         scale: u8,
     ) -> Result<(), Box<Error>> {
-        // ToDo - set a scale from the opts.
         let scale: i32 = i32::from(scale);
 
         // Get the size of the code.
