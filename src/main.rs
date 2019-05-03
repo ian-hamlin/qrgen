@@ -106,7 +106,13 @@ struct Opt {
 
     /// The side length (measured in pixels, must be positive) of each module, defaults to 8.  
     /// This value only applies when using the PNG format.
-    #[structopt(short = "a", long = "scale", default_value = "8")]
+    /// Must be between 1 and 255 (inclusive)
+    #[structopt(
+        short = "a",
+        long = "scale",
+        default_value = "8",
+        parse(try_from_str = "parse_qr_scale")
+    )]
     scale: u8,
 }
 
@@ -146,7 +152,7 @@ fn parse_qr_version(src: &str) -> Result<qrcodegen::Version, String> {
     let input = src.parse::<u8>();
 
     match input {
-        Ok(x) if x > 0_u8 && x < 41_u8 => Ok(qrcodegen::Version::new(x)),
+        Ok(x) if x > 0 && x < 41 => Ok(qrcodegen::Version::new(x)),
         _ => Err(String::from(
             "QR Code Model 2 version number must be between 1 and 40 inclusive.",
         )),
@@ -157,7 +163,7 @@ fn parse_qr_mask(src: &str) -> Result<qrcodegen::Mask, String> {
     let input = src.parse::<u8>();
 
     match input {
-        Ok(x) if x < 8_u8 => Ok(qrcodegen::Mask::new(x)),
+        Ok(x) if x < 8 => Ok(qrcodegen::Mask::new(x)),
         _ => Err(String::from("QR mask must be between 0 and 7 inclusive.")),
     }
 }
@@ -168,6 +174,17 @@ fn parse_chunk_size(src: &str) -> Result<usize, String> {
     match input {
         Ok(x) if x > 0 => Ok(x),
         _ => Err(String::from("Chunk size must be a number greater than 0.")),
+    }
+}
+
+fn parse_qr_scale(src: &str) -> Result<u8, String> {
+    let input = src.parse::<u8>();
+
+    match input {
+        Ok(x) if x > 0 => Ok(x),
+        _ => Err(String::from(
+            "The module scale must be a number between 1 and 255 inclusive.",
+        )),
     }
 }
 
@@ -304,6 +321,24 @@ mod tests {
         let res = parse_qr_version("41").err();
         assert_eq!(
             Some("QR Code Model 2 version number must be between 1 and 40 inclusive.".to_string()),
+            res
+        );
+    }
+
+    #[test]
+    fn should_parse_qr_scale_to_error_low() {
+        let res = parse_qr_scale("0").err();
+        assert_eq!(
+            Some("The module scale must be a number between 1 and 255 inclusive.".to_string()),
+            res
+        );
+    }
+
+    #[test]
+    fn should_parse_qr_scale_to_error_high() {
+        let res = parse_qr_scale("256").err();
+        assert_eq!(
+            Some("The module scale must be a number between 1 and 255 inclusive.".to_string()),
             res
         );
     }
