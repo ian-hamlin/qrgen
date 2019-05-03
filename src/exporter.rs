@@ -132,6 +132,10 @@ impl Exporter {
                 data_length,
             );
 
+            let offset_fn = |x: i32, y: i32, s: u32, cts: usize| {
+                (x as usize * cts) + (y as usize * (s as usize * cts))
+            };
+
             // this does not combine with itself so zip with (size,size).
             let points = (0..size as i32)
                 .tuple_combinations::<(i32, i32)>()
@@ -139,8 +143,7 @@ impl Exporter {
             for point in points {
                 let y = point.0;
                 let x = point.1;
-                let offset = (x as usize * colour_type_samples)
-                    + (y as usize * (size as usize * colour_type_samples));
+                let offset = offset_fn(x, y, size, colour_type_samples);
 
                 if qr_code.get_module(x / scale - border, y / scale - border) {
                     data[offset] = 0;
@@ -150,8 +153,7 @@ impl Exporter {
 
                 let y = point.1;
                 let x = point.0;
-                let offset = (x as usize * colour_type_samples)
-                    + (y as usize * (size as usize * colour_type_samples));
+                let offset = offset_fn(x, y, size, colour_type_samples);
 
                 if qr_code.get_module(x / scale - border, y / scale - border) {
                     data[offset] = 0;
