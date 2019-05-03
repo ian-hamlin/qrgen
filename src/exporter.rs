@@ -199,3 +199,32 @@ impl Checked for Option<i32> {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn checked_size_should_return_none_for_large_border() {
+        let s = Some(1_i32);
+        let res = s.checked_size(1_i32, i32::max_value());
+
+        assert_eq!(None, res);
+    }
+
+    #[test]
+    fn checked_size_should_return_none_for_large_add() {
+        let s = Some(i32::max_value());
+        let res = s.checked_size(1_i32, i32::max_value() - 1);
+
+        assert_eq!(None, res);
+    }
+
+    #[test]
+    fn checked_size_should_return_none_for_large_scale() {
+        let s = Some(2);
+        let res = s.checked_size(i32::max_value(), 2);
+
+        assert_eq!(None, res);
+    }
+}
