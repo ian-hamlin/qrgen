@@ -152,6 +152,7 @@ impl Exporter {
                 let offset = offset_fn(x, y, size, colour_type_samples);
 
                 if qr_code.get_module(x / scale - border, y / scale - border) {
+                    // ToDo - this needs to change based on the colour sample level.
                     data[offset] = 0;
                     data[offset + 1] = 0;
                     data[offset + 2] = 0;
