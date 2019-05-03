@@ -118,8 +118,8 @@ impl Exporter {
                 data_length,
             );
 
-            for x in 0..(size as i32) {
-                for y in 0..(size as i32) {
+            for y in 0..(size as i32) {
+                for x in 0..(size as i32) {
                     if qr_code.get_module(x / scale - border, y / scale - border) {
                         data[offset] = 0;
                         data[offset + 1] = 0;
