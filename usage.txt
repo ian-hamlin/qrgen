@@ -31,7 +31,8 @@ OPTIONS:
     -o, --output <output>                Output path, or current working directory if not specified or - provided.
                                          [default: -]
     -a, --scale <scale>                  The side length (measured in pixels, must be positive) of each module, defaults
-                                         to 8. This value only applies when using the PNG format. [default: 8]
+                                         to 8. This value only applies when using the PNG format. Must be between 1 and
+                                         255 (inclusive) [default: 8]
 
 ARGS:
     <infile>...    Input file, must be specified.

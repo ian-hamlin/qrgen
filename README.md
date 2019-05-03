@@ -68,7 +68,8 @@ OPTIONS:
     -o, --output <output>                Output path, or current working directory if not specified or - provided.
                                          [default: -]
     -a, --scale <scale>                  The side length (measured in pixels, must be positive) of each module, defaults
-                                         to 8. This value only applies when using the PNG format. [default: 8]
+                                         to 8. This value only applies when using the PNG format. Must be between 1 and
+                                         255 (inclusive) [default: 8]
 
 ARGS:
     <infile>...    Input file, must be specified.
@@ -112,10 +113,9 @@ user    0m24.714s
 sys     0m2.047s
 
 $ time ./qrgen wiktionary.csv -c 1000 -f png //PNG output is somewhat slower.
-
-real     2m0.353s
-user     12m57.677s
-sys     0m13.734s
+real     0m25.891s
+user     2m44.867s
+sys     0m7.801s
 
 $ time ./qrgen wiktionary.csv
 real    0m18.590s
