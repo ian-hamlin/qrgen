@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use log::trace;
 use png::HasParameters;
 use std::{error::Error, fs::OpenOptions, io::prelude::*, path::PathBuf};
@@ -114,7 +115,6 @@ impl Exporter {
 
             let mut writer = encoder.write_header()?;
             let mut data = vec![255_u8; data_length as usize];
-            let mut offset = 0_usize;
             let border = i32::from(border);
 
             trace!(
@@ -131,14 +131,29 @@ impl Exporter {
                 data_length,
             );
 
-            for y in 0..(size as i32) {
-                for x in 0..(size as i32) {
-                    if qr_code.get_module(x / scale - border, y / scale - border) {
-                        data[offset] = 0;
-                        data[offset + 1] = 0;
-                        data[offset + 2] = 0;
-                    }
-                    offset += 3;
+            // this does not combine with itself so zip with (size,size).
+            let points = (0..size as i32)
+                .tuple_combinations::<(i32, i32)>()
+                .chain((0..size as i32).zip(0..size as i32));
+            for point in points {
+                let y = point.0;
+                let x = point.1;
+                let offset = (x as usize * 3) + (y as usize * (size as usize * 3));
+
+                if qr_code.get_module(x / scale - border, y / scale - border) {
+                    data[offset] = 0;
+                    data[offset + 1] = 0;
+                    data[offset + 2] = 0;
+                }
+
+                let y = point.1;
+                let x = point.0;
+                let offset = (x as usize * 3) + (y as usize * (size as usize * 3));
+
+                if qr_code.get_module(x / scale - border, y / scale - border) {
+                    data[offset] = 0;
+                    data[offset + 1] = 0;
+                    data[offset + 2] = 0;
                 }
             }
 
