@@ -1,6 +1,7 @@
 use itertools::Itertools;
 use log::trace;
 use png::HasParameters;
+use std::convert::TryFrom;
 use std::{error::Error, fs::OpenOptions, io::prelude::*, path::PathBuf};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -96,12 +97,16 @@ impl Exporter {
         border: u8,
         scale: u8,
     ) -> Result<(), Box<Error>> {
+        // Make everything a bit simpler to work with.
         let scale: i32 = i32::from(scale);
+        let border: i32 = i32::from(border);
+
+        // Set the colour type and get the samples per pixel.
         let colour_type = png::ColorType::RGB;
         let colour_type_samples = colour_type.samples();
 
         // Get the size of the code.
-        let size = (qr_code.size() as u32).checked_size(scale, border);
+        let size = Some(qr_code.size()).checked_size(scale, border);
 
         // Multiple by three as RGB has 3 values to get the data length for the PNG library.
         let data_length = size.checked_length(colour_type_samples);
@@ -111,12 +116,11 @@ impl Exporter {
             let size = size.unwrap();
             let data_length = data_length.unwrap();
 
-            let mut encoder = png::Encoder::new(writer, size, size);
+            let mut encoder = png::Encoder::new(writer, size as u32, size as u32);
             encoder.set(colour_type).set(png::BitDepth::Eight);
 
             let mut writer = encoder.write_header()?;
             let mut data = vec![255_u8; data_length as usize];
-            let border = i32::from(border);
 
             trace!(
                 "version = {:?}, errorcorrectionlevel = {:?}, mask = {:?}, size = {}, data length = {}",
@@ -132,14 +136,15 @@ impl Exporter {
                 data_length,
             );
 
-            let offset_fn = |x: i32, y: i32, s: u32, cts: usize| {
+            let offset_fn = |x: i32, y: i32, s: i32, cts: usize| {
                 (x as usize * cts) + (y as usize * (s as usize * cts))
             };
 
             // this does not combine with itself so zip with (size,size).
-            let points = (0..size as i32)
-                .tuple_combinations::<(i32, i32)>()
-                .chain((0..size as i32).zip(0..size as i32));
+            let points = (0..size)
+                .tuple_combinations::<(_, _)>()
+                .chain((0..size).zip(0..size));
+
             for point in points {
                 // TODO - I can probably make this into a macro?
                 let y = point.0;
@@ -164,31 +169,33 @@ impl Exporter {
             }
 
             writer.write_image_data(&data)?
+        } else {
+            Err("size or data length are out of bounds.")?
         }
 
         Ok(())
     }
 }
 
-trait CheckedSize {
-    fn checked_size(self, scale: i32, border: u8) -> Option<u32>;
+trait Checked {
+    fn checked_size(self, scale: i32, border: i32) -> Option<i32>;
+    fn checked_length(self, colour_depth: usize) -> Option<i32>;
 }
 
-impl CheckedSize for u32 {
-    fn checked_size(self, scale: i32, border: u8) -> Option<u32> {
-        Some(
-            self.checked_add(u32::from(border) * 2)?
-                .checked_mul(scale as u32)?,
-        )
+impl Checked for Option<i32> {
+    fn checked_size(self, scale: i32, border: i32) -> Option<i32> {
+        if let Some(b) = border.checked_mul(2) {
+            Some(self?.checked_add(b)?.checked_mul(scale)?)
+        } else {
+            None
+        }
     }
-}
 
-trait CheckdLength {
-    fn checked_length(self, colour_depth: usize) -> Option<u32>;
-}
-
-impl CheckdLength for Option<u32> {
-    fn checked_length(self, colour_depth: usize) -> Option<u32> {
-        Some(self?.checked_mul(self?)?.checked_mul(colour_depth as u32)?)
+    fn checked_length(self, colour_depth: usize) -> Option<i32> {
+        if let Ok(cd) = i32::try_from(colour_depth) {
+            Some(self?.checked_mul(self?)?.checked_mul(cd)?)
+        } else {
+            None
+        }
     }
 }
