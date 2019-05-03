@@ -96,7 +96,7 @@ struct Opt {
 
     /// The target output format.  Defaults to SVG if not specified.
     #[structopt(
-        name = "Output format type",
+        name = "output format type",
         short = "f",
         long = "format",
         default_value = "SVG",
