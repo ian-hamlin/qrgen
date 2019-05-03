@@ -97,12 +97,14 @@ impl Exporter {
         scale: u8,
     ) -> Result<(), Box<Error>> {
         let scale: i32 = i32::from(scale);
+        let colour_type = png::ColorType::RGB;
+        let colour_type_samples = colour_type.samples();
 
         // Get the size of the code.
         let size = (qr_code.size() as u32).checked_size(scale, border);
 
         // Multiple by three as RGB has 3 values to get the data length for the PNG library.
-        let data_length = size.checked_length(3);
+        let data_length = size.checked_length(colour_type_samples);
 
         if size.is_some() && data_length.is_some() {
             // Both are some, so this is OK.
@@ -110,7 +112,7 @@ impl Exporter {
             let data_length = data_length.unwrap();
 
             let mut encoder = png::Encoder::new(writer, size, size);
-            encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
+            encoder.set(colour_type).set(png::BitDepth::Eight);
 
             let mut writer = encoder.write_header()?;
             let mut data = vec![255_u8; data_length as usize];
@@ -137,7 +139,8 @@ impl Exporter {
             for point in points {
                 let y = point.0;
                 let x = point.1;
-                let offset = (x as usize * 3) + (y as usize * (size as usize * 3));
+                let offset = (x as usize * colour_type_samples)
+                    + (y as usize * (size as usize * colour_type_samples));
 
                 if qr_code.get_module(x / scale - border, y / scale - border) {
                     data[offset] = 0;
@@ -147,7 +150,8 @@ impl Exporter {
 
                 let y = point.1;
                 let x = point.0;
-                let offset = (x as usize * 3) + (y as usize * (size as usize * 3));
+                let offset = (x as usize * colour_type_samples)
+                    + (y as usize * (size as usize * colour_type_samples));
 
                 if qr_code.get_module(x / scale - border, y / scale - border) {
                     data[offset] = 0;
@@ -177,11 +181,11 @@ impl CheckedSize for u32 {
 }
 
 trait CheckdLength {
-    fn checked_length(self, colour_depth: u32) -> Option<u32>;
+    fn checked_length(self, colour_depth: usize) -> Option<u32>;
 }
 
 impl CheckdLength for Option<u32> {
-    fn checked_length(self, colour_depth: u32) -> Option<u32> {
-        Some(self?.checked_mul(self?)?.checked_mul(colour_depth)?)
+    fn checked_length(self, colour_depth: usize) -> Option<u32> {
+        Some(self?.checked_mul(self?)?.checked_mul(colour_depth as u32)?)
     }
 }
