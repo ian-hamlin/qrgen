@@ -106,8 +106,8 @@ impl Exporter {
         scale: u8,
     ) -> Result<(), Box<Error>> {
         // Make everything a bit simpler to work with.
-        let scale: i32 = i32::from(scale);
-        let border: i32 = i32::from(border);
+        let scale = i32::from(scale);
+        let border = i32::from(border);
 
         // Set the colour type and get the samples per pixel.
         let colour_type = png::ColorType::RGB;
