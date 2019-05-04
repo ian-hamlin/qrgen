@@ -10,6 +10,12 @@ pub enum ExportFormat {
     PNG,
 }
 
+impl Default for ExportFormat {
+    fn default() -> Self {
+        ExportFormat::SVG
+    }
+}
+
 pub struct Exporter {
     qr_code: qrcodegen::QrCode,
     output: PathBuf,

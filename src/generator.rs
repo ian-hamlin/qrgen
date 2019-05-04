@@ -167,7 +167,7 @@ impl QrConfig {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct OutputConfig {
     output: PathBuf,
     border: u8,
@@ -186,6 +186,7 @@ impl OutputConfig {
     }
 }
 
+#[derive(Default, Clone, Copy, Debug)]
 pub struct ProcessingConfig {
     chunk_size: usize,
     has_headers: bool,
@@ -202,8 +203,55 @@ impl ProcessingConfig {
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
+    use std::io::Cursor;
 
-    // #[test]
-    // fn ensure_csv_is_flexible() {}
+    fn default_generator() -> Generator {
+        Generator::new(
+            Vec::new(),
+            QrConfig::new(
+                qrcodegen::Version::new(1),
+                qrcodegen::Version::new(2),
+                qrcodegen::QrCodeEcc::High,
+                None,
+            ),
+            Default::default(),
+            Default::default(),
+        )
+    }
+
+    #[test]
+    fn ensure_csv_is_flexible_and_reads_header() {
+        let gen = default_generator();
+        let buff = Cursor::new("file_name,qr_data\nfile_name,qr_data,extra");
+
+        let reader = gen.csv_reader(buff);
+        let all_ok = reader.into_records().all(|r| r.is_ok());
+
+        assert!(all_ok);
+    }
+
+    #[test]
+    fn ensure_csv_skips_header() {
+        let mut gen = default_generator();
+        gen.proc_conf.has_headers = true;
+        let buff = Cursor::new("file_name,qr_data\nfile_name,qr_data,extra");
+
+        let reader = gen.csv_reader(buff);
+        let count = reader.into_records().count();
+
+        assert_eq!(1, count);
+    }
+
+    #[test]
+    fn emsure_csv_trims() {
+        let gen = default_generator();
+        let buff = Cursor::new("  file_name, qr_data ");
+
+        let mut reader = gen.csv_reader(buff);
+        let record = reader.records().next().unwrap().unwrap();
+
+        assert_eq!("file_name", record[0].to_string());
+        assert_eq!("qr_data", record[1].to_string());
+    }
 }
