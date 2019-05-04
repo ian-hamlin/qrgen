@@ -92,7 +92,7 @@ impl Generator {
                     qrcodegen::QrSegmentMode::Byte => "Byte",
                     qrcodegen::QrSegmentMode::Eci => "Eci",
                     qrcodegen::QrSegmentMode::Kanji => "Kanji",
-                    qrcodegen::QrSegmentMode::Numeric => "AlphanNumericumeric",
+                    qrcodegen::QrSegmentMode::Numeric => "Numeric",
                 },
                 s.num_chars()
             );
