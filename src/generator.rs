@@ -3,7 +3,7 @@ use crate::exporter;
 use log::{trace, warn};
 use qrcodegen;
 use rayon::prelude::*;
-use std::{error::Error, fmt, fs::File, path::PathBuf};
+use std::{error::Error, fmt, fs::File, io, path::PathBuf};
 
 pub struct Generator {
     qr_conf: QrConfig,
@@ -38,7 +38,8 @@ impl Generator {
 
     fn process_file(&self, file_path: &PathBuf) -> Result<(), Box<Error>> {
         trace!("process file {}", file_path.display());
-        let reader = self.csv_reader(file_path)?;
+        let file = File::open(file_path)?;
+        let reader = self.csv_reader(file);
         let chunks = chunker::Chunker::new(reader, self.proc_conf.chunk_size);
 
         for chunk in chunks {
@@ -70,14 +71,12 @@ impl Generator {
         Ok(())
     }
 
-    fn csv_reader(&self, file_path: &PathBuf) -> Result<csv::Reader<File>, Box<Error>> {
-        let file = File::open(file_path)?;
-
-        Ok(csv::ReaderBuilder::new()
+    fn csv_reader<R: io::Read>(&self, reader: R) -> csv::Reader<R> {
+        csv::ReaderBuilder::new()
             .has_headers(self.proc_conf.has_headers)
             .trim(csv::Trim::All)
             .flexible(true)
-            .from_reader(file))
+            .from_reader(reader)
     }
 
     fn encode(&self, record: &csv::StringRecord) -> Option<qrcodegen::QrCode> {
@@ -199,4 +198,12 @@ impl ProcessingConfig {
             has_headers,
         }
     }
+}
+
+#[cfg(test)]
+mod tests {
+    // use super::*;
+
+    // #[test]
+    // fn ensure_csv_is_flexible() {}
 }
