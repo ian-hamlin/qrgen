@@ -144,7 +144,7 @@ impl Exporter {
                 data_length,
             );
 
-            let offset_fn = |x: i32, y: i32, s: i32, cts: usize| {
+            let offset_fn = |x: i32, y: i32, s: i32, cts: usize| -> usize {
                 (x as usize * cts) + (y as usize * (s as usize * cts))
             };
 
@@ -154,26 +154,19 @@ impl Exporter {
                 .chain((0..size).zip(0..size));
 
             for point in points {
-                // TODO - I can probably make this into a macro?
-                let y = point.0;
-                let x = point.1;
-                let offset = offset_fn(x, y, size, colour_type_samples);
+                let offset_yx = offset_fn(point.1, point.0, size, colour_type_samples);
+                let offset_xy = offset_fn(point.0, point.1, size, colour_type_samples);
 
-                if qr_code.get_module(x / scale - border, y / scale - border) {
-                    // ToDo - this needs to change based on the colour sample level.
-                    data[offset] = 0;
-                    data[offset + 1] = 0;
-                    data[offset + 2] = 0;
+                if qr_code.get_module(point.1 / scale - border, point.0 / scale - border) {
+                    data[offset_yx] = 0;
+                    data[offset_yx + 1] = 0;
+                    data[offset_yx + 2] = 0;
                 }
 
-                let y = point.1;
-                let x = point.0;
-                let offset = offset_fn(x, y, size, colour_type_samples);
-
-                if qr_code.get_module(x / scale - border, y / scale - border) {
-                    data[offset] = 0;
-                    data[offset + 1] = 0;
-                    data[offset + 2] = 0;
+                if qr_code.get_module(point.0 / scale - border, point.1 / scale - border) {
+                    data[offset_xy] = 0;
+                    data[offset_xy + 1] = 0;
+                    data[offset_xy + 2] = 0;
                 }
             }
 
