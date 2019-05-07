@@ -88,6 +88,12 @@ $ ./qrgen wiktionary.csv
 $ ./qrgen wiktionary_small.csv -s // This file has headers so the first line will now be skipped.
 ```
 
+```console
+$ # windows
+$ .\qrgen.exe wiktionary.csv
+$ .\qrgen.exe wiktionary_small.csv -s // This file has headers so the first line will now be skipped.
+```
+
 ### Logging
 
 Logging can be turned on with the --log/-l flag combined with zero or more -v options.
@@ -98,6 +104,14 @@ $ ./qrgen wiktionary.csv -l // Warn level
 $ ./qrgen wiktionary.csv -l -v // Info level
 $ ./qrgen wiktionary.csv -l -vv // Debug level
 $ ./qrgen wiktionary.csv -l -vvv // Trace level
+```
+
+```console
+$ # windows
+$ .\qrgen.exe wiktionary.csv -l // Warn level
+$ .\qrgen.exe wiktionary.csv -l -v // Info level
+$ .\qrgen.exe wiktionary.csv -l -vv // Debug level
+$ .\qrgen.exe wiktionary.csv -l -vvv // Trace level
 ```
 
 ### Parallelism
@@ -121,6 +135,12 @@ $ time ./qrgen wiktionary.csv
 real    0m18.590s
 user    0m16.928s
 sys     0m1.539s
+```
+
+```console
+$ # windows
+$ .\qrgen.exe wiktionary.csv -c 1000
+$ .\qrgen.exe wiktionary.csv -c 1000 -f png //PNG output is somewhat slower.
 ```
 
 ### Roadmap
