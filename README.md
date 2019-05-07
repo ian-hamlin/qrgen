@@ -149,8 +149,6 @@ $ Measure-Command {.\qrgen.exe .\wiktionary.csv}
 $ TotalSeconds      : 22.5059321
 ```
 
-
-
 ### Roadmap
 
 - Add support to zip the output.
