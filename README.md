@@ -139,9 +139,17 @@ sys     0m1.539s
 
 ```console
 $ # windows
-$ .\qrgen.exe wiktionary.csv -c 1000
-$ .\qrgen.exe wiktionary.csv -c 1000 -f png //PNG output is somewhat slower.
+$ Measure-Command {.\qrgen.exe .\wiktionary.csv -c 1000}
+$ TotalSeconds      : 7.6210615
+
+$ Measure-Command {.\qrgen.exe .\wiktionary.csv -c 1000 -f png}
+$ TotalSeconds      : 20.3840191
+
+$ Measure-Command {.\qrgen.exe .\wiktionary.csv}
+$ TotalSeconds      : 22.5059321
 ```
+
+
 
 ### Roadmap
 
