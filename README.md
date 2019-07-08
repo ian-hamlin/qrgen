@@ -1,3 +1,4 @@
+[![Build Status](https://dev.azure.com/morpork73/qrgen/_apis/build/status/ian-hamlin.qrgen?branchName=master)](https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=5&branchName=master)
 [![MIT licensed][license-badge]][license-url]
 [![dependency status][dependency-badge]][dependency-url]
 
