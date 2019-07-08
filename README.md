@@ -1,4 +1,4 @@
-[![Build Status](https://dev.azure.com/morpork73/qrgen/_apis/build/status/ian-hamlin.qrgen?branchName=master)](https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=5&branchName=master)
+[![Build Status][azure-badge]][azure-url]
 [![MIT licensed][license-badge]][license-url]
 [![dependency status][dependency-badge]][dependency-url]
 
@@ -154,7 +154,7 @@ $ TotalSeconds      : 22.5059321
 - Add support to zip the output.
 
 [azure-badge]: https://dev.azure.com/morpork73/qrgen/_apis/build/status/ian-hamlin.qrgen?branchName=master
-[azure-url]: https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=1&branchName=master
+[azure-url]: https://dev.azure.com/morpork73/qrgen/_build/latest?definitionId=5&branchName=master
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: LICENSE
 [dependency-badge]: https://deps.rs/repo/github/ian-hamlin/qrgen/status.svg
