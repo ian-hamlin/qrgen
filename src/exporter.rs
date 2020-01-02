@@ -1,6 +1,5 @@
 use itertools::Itertools;
 use log::trace;
-use png::HasParameters;
 use std::convert::TryFrom;
 use std::{error::Error, fs::OpenOptions, io::prelude::*, path::PathBuf};
 
@@ -125,7 +124,8 @@ impl Exporter {
             let data_length = data_length.unwrap();
 
             let mut encoder = png::Encoder::new(writer, size as u32, size as u32);
-            encoder.set(colour_type).set(png::BitDepth::Eight);
+            encoder.set_color(colour_type);
+            encoder.set_depth(png::BitDepth::Eight);
 
             let mut writer = encoder.write_header()?;
             let mut data = vec![255_u8; data_length as usize];
