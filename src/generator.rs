@@ -36,7 +36,7 @@ impl Generator {
         }
     }
 
-    fn process_file(&self, file_path: &PathBuf) -> Result<(), Box<Error>> {
+    fn process_file(&self, file_path: &PathBuf) -> Result<(), Box<dyn Error>> {
         trace!("process file {}", file_path.display());
         let file = File::open(file_path)?;
         let reader = self.csv_reader(file);

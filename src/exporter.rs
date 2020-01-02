@@ -44,7 +44,7 @@ impl Exporter {
         }
     }
 
-    pub fn export(&mut self) -> Result<(), Box<Error>> {
+    pub fn export(&mut self) -> Result<(), Box<dyn Error>> {
         self.output.push(&self.file_name);
 
         match self.format {
@@ -79,7 +79,7 @@ impl Exporter {
         writer: &mut W,
         qr_code: &qrcodegen::QrCode,
         border: u8,
-    ) -> Result<(), Box<Error>> {
+    ) -> Result<(), Box<dyn Error>> {
         let svg = qr_code.to_svg_string(i32::from(border));
 
         trace!(
@@ -104,7 +104,7 @@ impl Exporter {
         qr_code: &qrcodegen::QrCode,
         border: u8,
         scale: u8,
-    ) -> Result<(), Box<Error>> {
+    ) -> Result<(), Box<dyn Error>> {
         // Make everything a bit simpler to work with.
         let scale = i32::from(scale);
         let border = i32::from(border);
