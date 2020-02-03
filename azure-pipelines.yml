@@ -27,7 +27,7 @@ jobs:
         MacOS:
           vmImage: macOS-10.13
         Windows:
-          vmImage: vs2017-win2016
+          vmImage: windows-2019
     pool:
       vmImage: $(vmImage)
     steps:
@@ -57,7 +57,7 @@ jobs:
   - job: create_windows_binary
     displayName: "Create release binaries for Windows"
     pool:
-      vmImage: vs2017-win2016
+      vmImage: windows-2019
     steps:
       - template: ci/azure-install-rust.yml  
       - script: cargo build --release
