@@ -16,8 +16,7 @@ steps:
   - script: |
       curl -sSf -o rustup-init.exe https://win.rustup.rs
       rustup-init.exe -y --profile minimal --default-toolchain %RUSTUP_TOOLCHAIN%
-      rustup target add --toolchain %RUSTUP_TOOLCHAIN%> i686-pc-windows-msvc
-      rustup set default-host i686-pc-windows-msvc
+      rustup target list
       set PATH=%PATH%;%USERPROFILE%\.cargo\bin
       echo "##vso[task.setvariable variable=PATH;]%PATH%;%USERPROFILE%\.cargo\bin"
     env:
