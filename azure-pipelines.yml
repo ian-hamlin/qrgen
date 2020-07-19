@@ -25,7 +25,7 @@ jobs:
         Linux:
           vmImage: ubuntu-16.04
         MacOS:
-          vmImage: macOS-10.13
+          vmImage: macOS-latest
         Windows:
           vmImage: windows-2019
     pool:
@@ -69,7 +69,7 @@ jobs:
   - job: create_macOS_binary
     displayName: "Create release binaries for MacOS"
     pool:
-      vmImage: macOS-10.13
+      vmImage: macOS-latest
     steps:
       - template: ci/azure-install-rust.yml  
       - script: cargo build --release
