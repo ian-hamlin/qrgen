@@ -1,6 +1,5 @@
 [![Build Status][azure-badge]][azure-url]
 [![MIT licensed][license-badge]][license-url]
-[![dependency status][dependency-badge]][dependency-url]
 
 ## About
 
