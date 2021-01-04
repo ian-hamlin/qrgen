@@ -11,7 +11,7 @@ use structopt::StructOpt;
 #[derive(StructOpt)]
 struct Opt {
     /// Input file, must be specified.
-    #[structopt(name = "infile", parse(from_os_str), raw(required = "true"))]
+    #[structopt(name = "infile", parse(from_os_str), required = true)]
     infile: Vec<PathBuf>,
 
     /// Output path, or current working directory if not specified or - provided.
@@ -20,7 +20,7 @@ struct Opt {
         short = "o",
         long = "output",
         default_value = "-",
-        parse(from_os_str = "parse_output_directory")
+        parse(from_os_str = parse_output_directory)
     )]
     output: PathBuf,
 
@@ -30,7 +30,7 @@ struct Opt {
         short = "m",
         long = "min",
         default_value = "1",
-        parse(try_from_str = "parse_qr_version")
+        parse(try_from_str = parse_qr_version)
     )]
     qr_version_min: qrcodegen::Version,
 
@@ -40,7 +40,7 @@ struct Opt {
         short = "x",
         long = "max",
         default_value = "40",
-        parse(try_from_str = "parse_qr_version")
+        parse(try_from_str = parse_qr_version)
     )]
     qr_version_max: qrcodegen::Version,
 
@@ -54,7 +54,7 @@ struct Opt {
         short = "e",
         long = "error",
         default_value = "High",
-        parse(try_from_str = "parse_qr_ecc")
+        parse(try_from_str = parse_qr_ecc)
     )]
     error_correction: qrcodegen::QrCodeEcc,
 
@@ -65,7 +65,7 @@ struct Opt {
         short = "c",
         long = "chunk",
         default_value = "1",
-        parse(try_from_str = "parse_chunk_size")
+        parse(try_from_str = parse_chunk_size)
     )]
     chunk_size: usize,
 
@@ -91,7 +91,7 @@ struct Opt {
         name = "mask",
         short = "k",
         long = "mask",
-        parse(try_from_str = "parse_qr_mask")
+        parse(try_from_str = parse_qr_mask)
     )]
     mask: Option<qrcodegen::Mask>,
 
@@ -101,7 +101,7 @@ struct Opt {
         short = "f",
         long = "format",
         default_value = "SVG",
-        parse(try_from_str = "parse_qr_format")
+        parse(try_from_str = parse_qr_format)
     )]
     format: exporter::ExportFormat,
 
@@ -112,7 +112,7 @@ struct Opt {
         short = "a",
         long = "scale",
         default_value = "8",
-        parse(try_from_str = "parse_qr_scale")
+        parse(try_from_str = parse_qr_scale)
     )]
     scale: u8,
 }

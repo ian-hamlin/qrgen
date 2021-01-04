@@ -1,5 +1,6 @@
 edition = "2018"
 max_width = 100
+#width_heuristics = "Off"
 #wrap_comments = true
 #comment_width = 120
 #normalize_comments = true
