@@ -244,7 +244,7 @@ mod tests {
     }
 
     #[test]
-    fn emsure_csv_trims() {
+    fn ensure_csv_trims() {
         let gen = default_generator();
         let buff = Cursor::new("  file_name, qr_data ");
 
