@@ -7,9 +7,9 @@ A simple command line tool to bulk-generate QR Codes from one or more CSV files.
 
 Allows control over the following QR configuration options:
 
-* QR max and min version
-* Error correction level
-* Mask
+- QR max and min version
+- Error correction level
+- Mask
 
 ### Latest Release
 
@@ -17,13 +17,14 @@ Allows control over the following QR configuration options:
 
 #### Downloads
 
-* [x86_64-apple-darwin.zip][mac-release]
-* [x86_64-pc-windows-msvc.zip][windows-release]
-* [x86_64-unknown-linux-musl.zip][linux-release]
+- [x86_64-apple-darwin.zip][mac-release]
+- [x86_64-pc-windows-msvc.zip][windows-release]
+- [i686-pc-windows-msvc.zip][windows-release-i686]
+- [x86_64-unknown-linux-musl.zip][linux-release]
 
 ## Description
 
-Given one or more input files, each line will be read and turned into a QR code.  The file must have the following CSV
+Given one or more input files, each line will be read and turned into a QR code. The file must have the following CSV
 format:
 
 ```CSV
@@ -78,19 +79,19 @@ ARGS:
 
 ### Basic
 
-The most basic usage is to pass a single CSV file.  This would generate QR Codes using the defaults and saving the
+The most basic usage is to pass a single CSV file. This would generate QR Codes using the defaults and saving the
 output to the current working directory.
 
 ```console
-$ # macOS
-$ ./qrgen wiktionary.csv
-$ ./qrgen wiktionary_small.csv -s // This file has headers so the first line will now be skipped.
+# macOS
+./qrgen wiktionary.csv
+./qrgen wiktionary_small.csv -s // This file has headers so the first line will now be skipped.
 ```
 
 ```console
-$ # windows
-$ .\qrgen.exe wiktionary.csv
-$ .\qrgen.exe wiktionary_small.csv -s // This file has headers so the first line will now be skipped.
+# windows
+.\qrgen.exe wiktionary.csv
+.\qrgen.exe wiktionary_small.csv -s // This file has headers so the first line will now be skipped.
 ```
 
 ### Logging
@@ -98,24 +99,24 @@ $ .\qrgen.exe wiktionary_small.csv -s // This file has headers so the first line
 Logging can be turned on with the --log/-l flag combined with zero or more -v options.
 
 ```console
-$ # macOS
-$ ./qrgen wiktionary.csv -l // Warn level
-$ ./qrgen wiktionary.csv -l -v // Info level
-$ ./qrgen wiktionary.csv -l -vv // Debug level
-$ ./qrgen wiktionary.csv -l -vvv // Trace level
+# macOS
+./qrgen wiktionary.csv -l // Warn level
+./qrgen wiktionary.csv -l -v // Info level
+./qrgen wiktionary.csv -l -vv // Debug level
+./qrgen wiktionary.csv -l -vvv // Trace level
 ```
 
 ```console
-$ # windows
-$ .\qrgen.exe wiktionary.csv -l // Warn level
-$ .\qrgen.exe wiktionary.csv -l -v // Info level
-$ .\qrgen.exe wiktionary.csv -l -vv // Debug level
-$ .\qrgen.exe wiktionary.csv -l -vvv // Trace level
+# windows
+.\qrgen.exe wiktionary.csv -l // Warn level
+.\qrgen.exe wiktionary.csv -l -v // Info level
+.\qrgen.exe wiktionary.csv -l -vv // Debug level
+.\qrgen.exe wiktionary.csv -l -vvv // Trace level
 ```
 
 ### Parallelism
 
-For larger CSV files you can try changing the chunk size.  The tool will then try to process N rows in parallel, 
+For larger CSV files you can try changing the chunk size. The tool will then try to process N rows in parallel,
 this can lead to speed improvements.
 
 ```console
@@ -137,15 +138,15 @@ sys     0m1.539s
 ```
 
 ```console
-$ # windows
-$ Measure-Command {.\qrgen.exe .\wiktionary.csv -c 1000}
-$ TotalSeconds      : 7.6210615
+# windows
+Measure-Command {.\qrgen.exe .\wiktionary.csv -c 1000}
+TotalSeconds      : 7.6210615
 
-$ Measure-Command {.\qrgen.exe .\wiktionary.csv -c 1000 -f png}
-$ TotalSeconds      : 20.3840191
+Measure-Command {.\qrgen.exe .\wiktionary.csv -c 1000 -f png}
+TotalSeconds      : 20.3840191
 
-$ Measure-Command {.\qrgen.exe .\wiktionary.csv}
-$ TotalSeconds      : 22.5059321
+Measure-Command {.\qrgen.exe .\wiktionary.csv}
+TotalSeconds      : 22.5059321
 ```
 
 ### Roadmap
@@ -161,4 +162,5 @@ $ TotalSeconds      : 22.5059321
 [latest-release]: https://github.com/ian-hamlin/qrgen/releases/latest
 [mac-release]: https://github.com/ian-hamlin/qrgen/releases/latest/download/x86_64-apple-darwin.zip
 [windows-release]: https://github.com/ian-hamlin/qrgen/releases/latest/download/x86_64-pc-windows-msvc.zip
+[windows-release-i686]: https://github.com/ian-hamlin/qrgen/releases/latest/download/i686-pc-windows-msvc.zip
 [linux-release]: https://github.com/ian-hamlin/qrgen/releases/latest/download/x86_64-unknown-linux-musl.zip
