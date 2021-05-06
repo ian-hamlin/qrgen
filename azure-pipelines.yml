@@ -101,6 +101,7 @@ jobs:
       - run_cargo_test
       - create_linux_binary
       - create_windows_binary
+      - create_windows_binary_i686_pc_windows_msvc
       - create_macOS_binary
     steps:
       - task: DownloadPipelineArtifact@0
@@ -129,11 +130,11 @@ jobs:
         displayName: "Download release - Windows i686"
         inputs:
           artifactName: dist_windows_i686
-          targetPath: $(System.DefaultWorkingDirectory)/windows
+          targetPath: $(System.DefaultWorkingDirectory)/windows_i686
       - task: ArchiveFiles@2
-        displayName: Gather assets Windows
+        displayName: Gather assets windows_i686
         inputs:
-          rootFolderOrFile: $(System.DefaultWorkingDirectory)/windows/qrgen.exe
+          rootFolderOrFile: $(System.DefaultWorkingDirectory)/windows_i686/qrgen.exe
           archiveType: "zip"
           archiveFile: $(System.DefaultWorkingDirectory)/i686-pc-windows-msvc.zip
       - task: DownloadPipelineArtifact@0
