@@ -167,7 +167,7 @@ jobs:
       - task: GithubRelease@0
         condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
         inputs:
-          gitHubConnection: "ian-hamlin"
+          gitHubConnection: "ian-hamlin-pat"
           repositoryName: "ian-hamlin/qrgen"
           action: "edit"
           target: "$(build.sourceVersion)"
