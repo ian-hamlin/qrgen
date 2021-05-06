@@ -55,7 +55,7 @@ jobs:
           name: dist_linux
 
   - job: create_windows_binary
-    displayName: "Create release binaries for Windows"
+    displayName: "Create release binaries for Windows x86_64"
     pool:
       vmImage: windows-2019
     steps:
@@ -67,7 +67,7 @@ jobs:
           name: dist_windows
 
   - job: create_windows_binary_i686_pc_windows_msvc
-    displayName: "Create release binaries for Windows"
+    displayName: "Create release binaries for Windows i686"
     pool:
       vmImage: windows-2019
     steps:
@@ -115,7 +115,7 @@ jobs:
           archiveType: "zip"
           archiveFile: $(System.DefaultWorkingDirectory)/x86_64-unknown-linux-musl.zip
       - task: DownloadPipelineArtifact@0
-        displayName: "Download release - Windows"
+        displayName: "Download release - Windows x86_64"
         inputs:
           artifactName: dist_windows
           targetPath: $(System.DefaultWorkingDirectory)/windows
@@ -125,6 +125,17 @@ jobs:
           rootFolderOrFile: $(System.DefaultWorkingDirectory)/windows/qrgen.exe
           archiveType: "zip"
           archiveFile: $(System.DefaultWorkingDirectory)/x86_64-pc-windows-msvc.zip
+      - task: DownloadPipelineArtifact@0
+        displayName: "Download release - Windows i686"
+        inputs:
+          artifactName: dist_windows_i686
+          targetPath: $(System.DefaultWorkingDirectory)/windows
+      - task: ArchiveFiles@2
+        displayName: Gather assets Windows
+        inputs:
+          rootFolderOrFile: $(System.DefaultWorkingDirectory)/windows/qrgen.exe
+          archiveType: "zip"
+          archiveFile: $(System.DefaultWorkingDirectory)/i686-pc-windows-msvc.zip
       - task: DownloadPipelineArtifact@0
         displayName: "Download release - MacOS"
         inputs:
