@@ -115,6 +115,10 @@ struct Opt {
         parse(try_from_str = parse_qr_scale)
     )]
     scale: u8,
+
+    /// A flag indicating if the svg output should render the <rect /> tag.  Ignored if using PNG.
+    #[structopt(long = "no-rect")]
+    no_rect: bool,
 }
 
 fn parse_output_directory(src: &OsStr) -> PathBuf {
@@ -199,7 +203,13 @@ impl Opt {
                 self.error_correction,
                 self.mask,
             ),
-            generator::OutputConfig::new(self.output, self.border, self.format, self.scale),
+            generator::OutputConfig::new(
+                self.output,
+                self.border,
+                self.format,
+                self.scale,
+                self.no_rect,
+            ),
             generator::ProcessingConfig::new(self.chunk_size, self.has_headers),
         )
     }

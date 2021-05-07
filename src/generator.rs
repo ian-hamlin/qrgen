@@ -55,6 +55,7 @@ impl Generator {
                             self.out_conf.format,
                             record[0].to_string(),
                             self.out_conf.scale,
+                            self.out_conf.no_rect,
                         );
                         let res = exp.export();
                         if res.is_err() {
@@ -173,15 +174,23 @@ pub struct OutputConfig {
     border: u8,
     format: exporter::ExportFormat,
     scale: u8,
+    no_rect: bool,
 }
 
 impl OutputConfig {
-    pub fn new(output: PathBuf, border: u8, format: exporter::ExportFormat, scale: u8) -> Self {
+    pub fn new(
+        output: PathBuf,
+        border: u8,
+        format: exporter::ExportFormat,
+        scale: u8,
+        no_rect: bool,
+    ) -> Self {
         OutputConfig {
             output,
             border,
             format,
             scale,
+            no_rect,
         }
     }
 }

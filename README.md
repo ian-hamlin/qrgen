@@ -46,6 +46,7 @@ FLAGS:
                      if not specified.
     -h, --help       Prints help information
     -l, --log        A flag indicating if output will be logged, defaults to false if not specified.
+        --no-rect    A flag indicating if the svg output should exclude the <rect /> tag.  Ignored if using PNG, <rect /> tag is rendered if not specified.
     -V, --version    Prints version information
     -v, --verbose    Verbose logging mode (-v, -vv, -vvv)
 
