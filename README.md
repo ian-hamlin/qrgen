@@ -43,37 +43,41 @@ USAGE:
 
 FLAGS:
     -s, --skip       A flag indicating if the first line of the CSV is a header and should be skipped, defaults to false
-                     if not specified.
+                     if not specified
     -h, --help       Prints help information
-    -l, --log        A flag indicating if output will be logged, defaults to false if not specified.
-        --no-rect    A flag indicating if the svg output should exclude the <rect /> tag.  Ignored if using PNG, <rect /> tag is rendered if not specified.
+    -l, --log        A flag indicating if output will be logged, defaults to false if not specified
+        --no-rect    A flag indicating if the svg output should render the <rect /> tag.  Ignored if using PNG
     -V, --version    Prints version information
     -v, --verbose    Verbose logging mode (-v, -vv, -vvv)
 
 OPTIONS:
     -x, --max <QR version max>              The maximum version number supported in the QR Code Model 2 standard, or 40
-                                            if not specified. [default: 40]
+                                            if not specified [default: 40]
     -m, --min <QR version min>              The minimum version number supported in the QR Code Model 2 standard, or 1
-                                            if not specified. [default: 1]
+                                            if not specified [default: 1]
+    -g, --background <background>           Set the foreground colour of the QR code using a six-digit hex value.
+                                            Defaults to FFFFFF [default: FFFFFF]
     -b, --border <border>                   The size of the border on the generated QR Code, defaults to 4 if not
-                                            specified. [default: 4]
+                                            specified [default: 4]
     -c, --chunk <chunk size>                The number of lines to try and process in parallel, if not specified
-                                            defaults to 1 and file is processed line by line. [default: 1]
+                                            defaults to 1 and file is processed line by line [default: 1]
     -e, --error <error correction level>    The error correction level used in this QR Code, or High if not specified.
                                             "Low" The QR Code can tolerate about  7% erroneous codewords. "Medium" The
                                             QR Code can tolerate about 15% erroneous codewords. "Quartile" The QR Code
                                             can tolerate about 25% erroneous codewords. "High" The QR Code can tolerate
-                                            about 30% erroneous codewords. [default: High]
-    -k, --mask <mask>                       The mask value to apply to the QR Code, between 0 and 7 (inclusive).
-    -f, --format <output format type>       The target output format.  Defaults to SVG if not specified. [default: SVG]
-    -o, --output <output path>              Output path, or current working directory if not specified or - provided.
+                                            about 30% erroneous codewords [default: High]
+    -r, --foreground <forgeround>           Set the foreground colour of the QR code using a six-digit hex value.
+                                            Defaults to 000000 [default: 000000]
+    -k, --mask <mask>                       The mask value to apply to the QR Code, between 0 and 7 (inclusive)
+    -f, --format <output format type>       The target output format.  Defaults to SVG if not specified [default: SVG]
+    -o, --output <output path>              Output path, or current working directory if not specified or - provided
                                             [default: -]
     -a, --scale <scale>                     The side length (measured in pixels, must be positive) of each module,
                                             defaults to 8. This value only applies when using the PNG format. Must be
                                             between 1 and 255 (inclusive) [default: 8]
 
 ARGS:
-    <infile>...    Input file, must be specified.
+    <infile>...    Input file, must be specified
 ```
 
 ## Examples
@@ -93,6 +97,16 @@ output to the current working directory.
 # windows
 .\qrgen.exe wiktionary.csv
 .\qrgen.exe wiktionary_small.csv -s // This file has headers so the first line will now be skipped.
+```
+
+### Colour
+
+Setting the background and foreground colours.
+
+```console
+# macOS
+./qrgen wiktionary.csv --background ff0000 --foreground 0000ff;
+./qrgen wiktionary.csv -g ff0000 -r 0000ff;
 ```
 
 ### Logging

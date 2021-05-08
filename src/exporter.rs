@@ -23,6 +23,8 @@ pub struct Exporter {
     file_name: String,
     scale: u8,
     no_rect: bool,
+    foreground: (u8, u8, u8),
+    background: (u8, u8, u8),
 }
 
 impl Exporter {
@@ -34,6 +36,8 @@ impl Exporter {
         file_name: String,
         scale: u8,
         no_rect: bool,
+        foreground: (u8, u8, u8),
+        background: (u8, u8, u8),
     ) -> Self {
         Exporter {
             qr_code,
@@ -43,6 +47,8 @@ impl Exporter {
             file_name,
             scale,
             no_rect,
+            foreground,
+            background,
         }
     }
 
@@ -118,7 +124,10 @@ impl Exporter {
 			"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" viewBox=\"0 0 {0} {0}\" stroke=\"none\">\n", dimension);
 
         if !no_rect {
-            result += "\t<rect width=\"100%\" height=\"100%\" fill=\"#FFFFFF\"/>\n";
+            result += &format!(
+                "\t<rect width=\"100%\" height=\"100%\" fill=\"#{:02X}{:02X}{:02X}\"/>\n",
+                self.background.0, self.background.1, self.background.2
+            );
         }
 
         result += "\t<path d=\"";
@@ -132,7 +141,10 @@ impl Exporter {
                 }
             }
         }
-        result += "\" fill=\"#000000\"/>\n";
+        result += &format!(
+            "\" fill=\"#{:02X}{:02X}{:02X}\"/>\n",
+            self.foreground.0, self.foreground.1, self.foreground.2
+        );
         result += "</svg>\n";
         result
     }
@@ -170,6 +182,18 @@ impl Exporter {
             let mut writer = encoder.write_header()?;
             let mut data = vec![255_u8; data_length as usize];
 
+            if self.background != (255, 255, 255) {
+                trace!("Setting background {:?}", self.background);
+                let mut idx = 0_usize;
+
+                while idx < data.len() {
+                    data[idx] = self.background.0;
+                    data[idx + 1] = self.background.1;
+                    data[idx + 2] = self.background.2;
+                    idx += 3;
+                }
+            }
+
             trace!(
                 "version = {:?}, errorcorrectionlevel = {:?}, mask = {:?}, size = {}, data length = {}",
                 qr_code.version().value(),
@@ -198,15 +222,15 @@ impl Exporter {
                 let offset_xy = offset_fn(point.0, point.1, size, colour_type_samples);
 
                 if qr_code.get_module(point.1 / scale - border, point.0 / scale - border) {
-                    data[offset_yx] = 0;
-                    data[offset_yx + 1] = 0;
-                    data[offset_yx + 2] = 0;
+                    data[offset_yx] = self.foreground.0;
+                    data[offset_yx + 1] = self.foreground.1;
+                    data[offset_yx + 2] = self.foreground.2;
                 }
 
                 if qr_code.get_module(point.0 / scale - border, point.1 / scale - border) {
-                    data[offset_xy] = 0;
-                    data[offset_xy + 1] = 0;
-                    data[offset_xy + 2] = 0;
+                    data[offset_xy] = self.foreground.0;
+                    data[offset_xy + 1] = self.foreground.1;
+                    data[offset_xy + 2] = self.foreground.2;
                 }
             }
 
@@ -307,6 +331,8 @@ mod tests {
             "".into(),
             1,
             false,
+            (0, 0, 0),
+            (255, 255, 255),
         );
 
         // Act.
@@ -517,6 +543,8 @@ mod tests {
             "".into(),
             1,
             true,
+            (0, 0, 0),
+            (255, 255, 255),
         );
 
         // Act.
@@ -725,6 +753,8 @@ mod tests {
             "".into(),
             1,
             false,
+            (0, 0, 0),
+            (255, 255, 255),
         );
 
         // Act.

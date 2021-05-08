@@ -56,6 +56,8 @@ impl Generator {
                             record[0].to_string(),
                             self.out_conf.scale,
                             self.out_conf.no_rect,
+                            self.out_conf.foreground,
+                            self.out_conf.background,
                         );
                         let res = exp.export();
                         if res.is_err() {
@@ -121,7 +123,7 @@ impl fmt::Display for Generator {
             f,
             "qr_conf = [QR Version Min:{}, QR Version Max:{}, Error Correction: {}, Mask:{}], \
              proc_conf = [Chunk Size:{}, Has CSV Header:{}], \
-             out_conf: [Border:{}, Format: {:?}, Output: {}], \
+             out_conf: [Border:{}, Format: {:?}, Exclude <rect />: {:?}, Foreground: {:?}, Fackgound: {:?}, Output: {}], \
              input: Files: {:?}:",
             self.qr_conf.qr_version_min.value(),
             self.qr_conf.qr_version_max.value(),
@@ -139,6 +141,9 @@ impl fmt::Display for Generator {
             self.proc_conf.has_headers,
             self.out_conf.border,
             self.out_conf.format,
+            self.out_conf.no_rect,
+            self.out_conf.foreground,
+            self.out_conf.background,
             self.out_conf.output.display(),
             self.files,
         )
@@ -175,6 +180,8 @@ pub struct OutputConfig {
     format: exporter::ExportFormat,
     scale: u8,
     no_rect: bool,
+    foreground: (u8, u8, u8),
+    background: (u8, u8, u8),
 }
 
 impl OutputConfig {
@@ -184,6 +191,8 @@ impl OutputConfig {
         format: exporter::ExportFormat,
         scale: u8,
         no_rect: bool,
+        foreground: (u8, u8, u8),
+        background: (u8, u8, u8),
     ) -> Self {
         OutputConfig {
             output,
@@ -191,6 +200,8 @@ impl OutputConfig {
             format,
             scale,
             no_rect,
+            foreground,
+            background,
         }
     }
 }

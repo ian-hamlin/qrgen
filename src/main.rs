@@ -119,6 +119,36 @@ struct Opt {
     /// A flag indicating if the svg output should render the <rect /> tag.  Ignored if using PNG.
     #[structopt(long = "no-rect")]
     no_rect: bool,
+
+    /// Set the foreground colour of the QR code using a six-digit hex value. Defaults to 000000.
+    #[structopt(
+        short = "r",
+        long = "foreground",
+        default_value = "000000",
+        parse(try_from_str = parse_rgb_from_hex)
+    )]
+    forgeround: (u8, u8, u8),
+
+    /// Set the foreground colour of the QR code using a six-digit hex value. Defaults to FFFFFF.
+    #[structopt(
+        short = "g",
+        long = "background",
+        default_value = "FFFFFF",
+        parse(try_from_str = parse_rgb_from_hex)
+    )]
+    background: (u8, u8, u8),
+}
+
+fn parse_rgb_from_hex(src: &str) -> Result<(u8, u8, u8), String> {
+    if src.len() != 6 {
+        return Err(String::from("Please enter only a six-digit hex value."));
+    }
+
+    let r = u8::from_str_radix(&src[0..2], 16).unwrap_or(0);
+    let g = u8::from_str_radix(&src[2..4], 16).unwrap_or(0);
+    let b = u8::from_str_radix(&src[4..6], 16).unwrap_or(0);
+
+    return Ok((r, g, b));
 }
 
 fn parse_output_directory(src: &OsStr) -> PathBuf {
@@ -209,6 +239,8 @@ impl Opt {
                 self.format,
                 self.scale,
                 self.no_rect,
+                self.forgeround,
+                self.background,
             ),
             generator::ProcessingConfig::new(self.chunk_size, self.has_headers),
         )
@@ -246,6 +278,21 @@ mod tests {
         let actual = parse_output_directory(OsStr::new("-"));
 
         assert_eq!(expect, actual);
+    }
+
+    #[test]
+    fn should_parse_rgb() {
+        let res = parse_rgb_from_hex("ff11c0").unwrap();
+        assert_eq!((255, 17, 192), res);
+    }
+
+    #[test]
+    fn should_parse_rgb_error() {
+        let res = parse_rgb_from_hex("ff11c0c").err();
+        assert_eq!(
+            Some("Please enter only a six-digit hex value.".to_string()),
+            res
+        );
     }
 
     #[test]

@@ -351,7 +351,7 @@ checksum = "d24ea38b2345f15533e6668104bec0136883404287e095f15f9ea2522e2b4b6c"
 
 [[package]]
 name = "qrgen"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "csv",
  "env_logger",
