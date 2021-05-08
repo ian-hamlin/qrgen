@@ -105,9 +105,12 @@ Setting the background and foreground colours.
 
 ```console
 # macOS
-./qrgen wiktionary.csv --background ff0000 --foreground 0000ff;
-./qrgen wiktionary.csv -g ff0000 -r 0000ff;
+./qrgen wiktionary.csv --background DC5067 --foreground 61528A
+./qrgen wiktionary.csv -g DC5067 -r 61528A
 ```
+
+![colour output sample](output_samples/website_colour.png)
+![default output sample.](output_samples/website.png)
 
 ### Logging
 
