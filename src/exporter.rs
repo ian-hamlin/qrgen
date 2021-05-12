@@ -184,13 +184,10 @@ impl Exporter {
 
             if self.background != (255, 255, 255) {
                 trace!("Setting background {:?}", self.background);
-                let mut idx = 0_usize;
-
-                while idx < data.len() {
-                    data[idx] = self.background.0;
-                    data[idx + 1] = self.background.1;
-                    data[idx + 2] = self.background.2;
-                    idx += 3;
+                for chunk in data.chunks_exact_mut(3) {
+                    chunk[0] = self.background.0;
+                    chunk[1] = self.background.1;
+                    chunk[2] = self.background.2;
                 }
             }
 
