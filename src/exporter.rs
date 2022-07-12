@@ -161,7 +161,7 @@ impl Exporter {
         let border = i32::from(border);
 
         // Set the colour type and get the samples per pixel.
-        let colour_type = png::ColorType::RGB;
+        let colour_type = png::ColorType::Rgb;
         let colour_type_samples = colour_type.samples();
 
         // Get the size of the code.

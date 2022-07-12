@@ -83,8 +83,7 @@ impl Generator {
     }
 
     fn encode(&self, record: &csv::StringRecord) -> Option<qrcodegen::QrCode> {
-        let chars: Vec<char> = record[1].chars().collect();
-        let segment = qrcodegen::QrSegment::make_segments(&chars);
+        let segment = qrcodegen::QrSegment::make_segments(&record[1]);
 
         for s in segment.iter() {
             trace!(
